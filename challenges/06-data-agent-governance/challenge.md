@@ -1,5 +1,7 @@
 # Challenge 06 — Fabric Data Agent governance
 
+> **Türkçe coach rehberi:** [Adım adım eğitim, demo ve mevcut kodun sınırları](COACH-TR.md).
+
 > **Outcome:** Fabric Data Agents (the natural-language Q&A layer over OneLake)
 > can only be created via PR, with an explicit allow-list of data sources, RAI-linted
 > instructions, and Purview-aware risk gating.

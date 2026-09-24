@@ -4,6 +4,10 @@ An agent-assisted governance framework that helps teams deploy Fabric the "right
 faster—codifying standards and producing repeatable templates, checks, and guidance
 using Fabric Skills and GitHub Copilot powered by *skills-for-fabricAgents*.
 
+> **Türkçe coach rehberleri:** Müşterilere eğitim vermek için
+> [buradan başlayın](docs/tr/README.md). GitHub, VS Code ve Copilot temelleri,
+> her challenge için adım adım rehber, demo akışı ve mevcut kodun sınırları dahildir.
+
 > Treat the Fabric tenant as **declarative infrastructure**. Nothing exists unless a YAML
 > manifest for it lives in `main`, was reviewed via Pull Request, and was provisioned by a
 > service principal through GitHub Actions.

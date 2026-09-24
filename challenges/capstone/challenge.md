@@ -1,5 +1,7 @@
 # Capstone — End-to-end integration
 
+> **Türkçe coach rehberi:** [Eğitim sırası, kapsam seçenekleri ve kanıt matrisi](COACH-TR.md).
+
 > **Outcome:** a single Pull Request, opened by your team, exercises every
 > challenge you completed — workspace, items, domain, label, access, medallion,
 > agent, audit, promotion — and you can prove it all worked from the dashboard.

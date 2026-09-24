@@ -1,5 +1,7 @@
 # Challenge 08 — Deployment pipelines & cross-environment promotion
 
+> **Türkçe coach rehberi:** [Adım adım eğitim, demo ve mevcut kodun sınırları](COACH-TR.md).
+
 > **Outcome:** items promote dev → stg → prd through **Fabric deployment
 > pipelines**, gated by PR labels and the same `production` environment approval
 > as Challenge 01.

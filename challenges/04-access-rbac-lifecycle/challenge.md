@@ -1,5 +1,7 @@
 # Challenge 04 — Access & RBAC lifecycle
 
+> Türkçe müşteri eğitimi: [Adım adım coach rehberi](COACH-TR.md) — mevcut kod ile geliştirme alıştırmalarını ayırır.
+
 > **Outcome:** every Fabric workspace role assignment is declared in `access/`,
 > Group-first, has an `expiresOn`, and is reviewed quarterly. Stale or risky
 > bindings open automatic remediation PRs.

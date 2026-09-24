@@ -1,5 +1,7 @@
 # Challenge 03 — Domains, capacities, and sensitivity
 
+> Türkçe müşteri eğitimi: [Adım adım coach rehberi](COACH-TR.md) — mevcut kod ile geliştirme alıştırmalarını ayırır.
+
 > **Outcome:** every workspace lands in the right Fabric **domain**, on the right
 > **capacity**, with the right **sensitivity label** — and the only way to change
 > any of those is a PR.

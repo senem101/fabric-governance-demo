@@ -1,5 +1,7 @@
 # Challenge 01 — Workspace as code
 
+> **Türkçe coach rehberi:** [Adım adım uygulama, demo ve mevcut kodun sınırları](COACH-TR.md).
+
 > **Outcome:** you can create, update, and decommission Fabric workspaces by opening
 > Pull Requests against YAML manifests. The tenant has zero workspaces that aren't in
 > `main`.
