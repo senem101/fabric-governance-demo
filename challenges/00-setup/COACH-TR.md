@@ -143,6 +143,7 @@ Repo yöneticisi, Actions'ı etkinleştirmeden önce şu hazırlıkları yapar:
 | `DEFAULT_OWNER_UPN` | Orijinal kurulum listesi için demo sahibinin Entra kullanıcı oturum açma adı; mevcut kod kullanmaz |
 | `LIVE_CHECKS` | İlk provada `false` |
 | `DRY_RUN` | İlk provada **`true`**; canlıya bilinçli geçişte `false` |
+| `DRIFT_ENABLED` | Bu demo için eklenen başlangıç kontrolü: **`false`**; drift rapor kapsamı onaylanmadan açmayın |
 
 Orijinal Challenge 00'daki `DEFAULT_OWNER_UPN` değişkenini de ekleyin.
 Değerini **Entra ID > Users > ilgili kullanıcı > User principal name**
@@ -150,6 +151,19 @@ alanından alın; GitHub kullanıcı adı veya SPN Object ID'si değildir.
 Mevcut workflow/script bu değişkeni kullanmaz; sahip atamaları manifestteki
 `owners` listesinden gelir. Değişkeni eklemek örnek owner'ı değiştirmez.
 UPN değerini public dosyalara veya loglara yazdırmayın.
+
+`DRIFT_ENABLED`, orijinal değişken listesine eklenen bir demo kontrolüdür.
+`drift.yml` job'ı yalnız değer `true` olduğunda çalışır; değişken eksik,
+boş veya `false` ise hem zamanlanmış hem manuel tetiklemede job atlanır.
+Bu durumda runner adımları, Azure login, tarama ve issue oluşturma çalışmaz.
+GitHub'da bir workflow kaydı veya `skipped` sonucu görünmesi drift taraması
+yapıldığı anlamına gelmez.
+
+Bu koruma, koşulu içeren workflow sürümünde geçerlidir; yalnız değişken
+eklemek eski `main`deki koşulsuz workflow'u değiştirmez. `DRY_RUN` drift'i
+durdurmaz. `DRIFT_ENABLED` de doğrudan çalıştırılan `scripts/drift.py`
+komutunu engellemez; kontrol GitHub job'ındadır. Demo dışı workspace
+isimlerinin public rapora çıkmayacağı doğrulanmadan değeri `true` yapmayın.
 
 `rules\policy.yaml` içindeki `capacityId` şu an örnek `3333...` değeridir.
 **Gerçek GUID ile değiştirin.** Kod policy'deki dolu ID'yi variable'dan önce
@@ -235,8 +249,9 @@ ve hata davranışı ayrıca uyarlanmıştır; ayrıntı 10. bölümdedir.
 3. `DRY_RUN=true` ile `production` environment onay/branch kurallarını kontrol edin.
 4. Yerel dosya değişikliği GitHub'daki workflow'u güncellemez. Hazırlık branch'ini
    doğru fork'a gönderme, inceleme ve birleştirme adımlarını ayrıca tamamlayın.
-5. Actions'ı bu hazırlıklardan sonra etkinleştirin; özellikle `drift` raporunun
-   public repo'da hangi bilgileri yayımlayacağını önceden değerlendirin.
+5. Actions'ı bu hazırlıklardan sonra etkinleştirin. Merge öncesinde
+   `DRIFT_ENABLED=false` değerini ve PR'daki job koşulunu kontrol edin;
+   drift raporunun public repo'da hangi bilgileri yayımlayacağını ayrıca değerlendirin.
 
 **Henüz uygulanmayan ek iyileştirme:** Provision'dan hemen önce schema/policy
 doğrulaması eklemek. PR workflow'u artık bütün workspace manifestlerini
@@ -288,7 +303,8 @@ ayrı tutulur. Solo demo, push veya GitHub Actions kullanımını yasaklamaz.
    gerçek CODEOWNERS eşleşmelerini hazırlayın ve en az bir PR/CODEOWNERS
    onayını zorunlu hale getirin.
 7. **Actions** sekmesinde gerekiyorsa workflow'ları etkinleştirin.
-   `drift` zamanlamasını gerçek kimlik/izin hazır olmadan açmayın.
+   `DRIFT_ENABLED=false` tutun; gerçek kimlik/izin ve rapor kapsamı
+   onaylanmadan drift'i açmayın. Bu opt-in koşulu SPN/OIDC modelini değiştirmez.
    Issues özelliği ve `drift`, `governance` etiketleri de hazır olmalı.
 
 ## 11. MCP/Skills ve kabul demosu

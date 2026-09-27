@@ -1,7 +1,7 @@
 name: drift
 
-# Keep this GitHub-hosted workflow disabled until OIDC and SPN access are ready
-# and the report contents are approved for publication in the target repository.
+# Set DRIFT_ENABLED=true only after SPN access and public report scope are reviewed.
+# An unset variable or any value other than true keeps the job skipped.
 
 on:
   schedule:
@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   drift:
+    if: ${{ vars.DRIFT_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0

@@ -56,6 +56,7 @@ kurulumda, gerekli otomatik kontroller geçince kendi PR'ını merge edebilirsin
 | Genel tenant kapsamı | API kullanımı ve workspace oluşturma demo grubuyla sınırlandırılır | Önceden `Entire organization` olan iki Core SPN ayarı ve `Create workspaces` korunur | Diğer kullanıcı ve otomasyonları etkilememek için mevcut kapsam daraltılmaz; tenant yalnız demo grubuna izole edilmiş sayılmaz |
 | PR kontrolünün kapsamı | Path filtreleriyle tetiklenir; yalnız değişen workspace manifestlerini denetler | Yerel workflow tüm PR'larda bütün workspace manifestlerini denetleyecek şekilde hazırlandı | Doküman PR'ları zorunlu check beklerken takılmaz; policy/schema değişikliği tüm workspace'ler için değerlendirilir |
 | OIDC giriş hatası | `validate` içindeki login hatasıyla devam edilebilir | Yerel workflow'da login hatası işi başarısız yapar | Başarısız kimlik doğrulama başarılı zorunlu kontrol gibi sunulmaz |
+| Drift başlangıcı | İş zamanlanmış veya manuel tetiklendiğinde doğrudan çalışabilir | `DRIFT_ENABLED` yalnız `true` olduğunda job çalışır; başlangıç değeri `false` | Rapor kapsamı gözden geçirilmeden otomatik tenant taraması ve public issue oluşturulması önlenir |
 
 **Production onayı hakkında nüans:** Orijinal Challenge 00 en az bir reviewer
 ister; reviewer'ın mutlaka PR yazarından farklı olacağını açıkça şart koşmaz.
@@ -90,7 +91,9 @@ ayarları da kullanılmaya devam eder.
 **OIDC bağlamı yetkiyi salt okumaya düşürmez.** Mevcut scriptin yalnız kontrol
 yapması, giriş yaptığı yönetici kimliğinin yazma yetkisini ortadan kaldırmaz.
 PR ve main işleri bu kimliği production onayından bağımsız kullanabilir.
-GitHub-hosted runner seçmek de SPN yetkilerini azaltmaz.
+GitHub-hosted runner seçmek de SPN yetkilerini azaltmaz. Yeni
+`DRIFT_ENABLED` koşulu yalnız drift job'ının başlamasını kontrol eder;
+OIDC güven bağlantısını veya SPN'nin mevcut yetkilerini daraltmaz.
 
 Gerçek deponun OIDC subject'i owner/repo kimlik numaralarını içeren immutable
 biçimdedir. Orijinal dokümandaki eski subject örneklerinin buna uyarlanması
@@ -103,6 +106,7 @@ Bu belgede gerçek tenant, uygulama, grup veya kapasite GUID'leri yayımlanmaz.
 |---|---|---|
 | `DRY_RUN=true` | Açık | Provision scriptinin gerçek değişiklik yapmasını önleyen başlangıç ayarıdır; bütün Azure/Fabric işlemlerini engelleyen bir yetki sınırı değildir |
 | `LIVE_CHECKS=false` | Kapalı | Entra gruplarının canlı varlık kontrolü henüz açılmadı; OIDC girişini veya SPN'nin yetkilerini kapatmaz |
+| `DRIFT_ENABLED=false` | Başlangıçta kapalı | Koşulu içeren GitHub workflow'unda zamanlanmış ve manuel drift job'ı atlanır; `true` ancak izinler ve yayımlanacak rapor kapsamı onaylandıktan sonra seçilir |
 | Gerçek manifest sahipleri ve policy kapasitesi | Hazırlık bekliyor | Örnek kimlikler canlıya uygun hale getirilmeden gerçek provisioning yapılmamalıdır |
 | `DEFAULT_OWNER_UPN` | Kişisel repoya eklendi; API ile dolu bir değer bulunduğu doğrulandı | Orijinal listede vardır, mevcut scriptler kullanmaz; sırf eklemek sahip ataması sağlamaz |
 | `validate` tetikleme kapsamı | Bu çalışma branch'indeki dosyada tüm PR'ları kapsıyor | Branch'teki dosya main'i otomatik güncellemez; gerçek PR çalıştırması ve merge ayrı adımlardır |
@@ -111,6 +115,14 @@ Bu belgede gerçek tenant, uygulama, grup veya kapasite GUID'leri yayımlanmaz.
 
 Bu satırlar, “solo demoda canlı doğrulama yapılmaz” veya “Actions
 çalıştırılamaz” şeklinde yorumlanmamalıdır.
+
+**Drift kontrolünün sınırı:** Job atlandığında Azure login, tarama ve issue
+oluşturma adımları çalışmaz; GitHub yine de atlanmış bir çalışma kaydı
+gösterebilir. Koşulu içermeyen eski bir workflow sürümü veya doğrudan
+çalıştırılan `scripts/drift.py` bu değişkeni kontrol etmez. Değişkeni eklemek
+tek başına yeterli değildir; koşulun bulunduğu workflow sürümü kullanılmalıdır.
+Mevcut drift scripti hâlâ çağıranın görebildiği workspace listesini karşılaştırır;
+demo kaynaklarına özgü bir kapsam filtresi henüz eklenmemiştir.
 
 ## 5. Uygulama durumu: ne yapıldı, ne bekliyor?
 
@@ -126,19 +138,19 @@ kontrol edilmelidir.
 | Hosted runner uyarlaması | Üç workflow ve ilgili rehberler bu çalışma branch'inde hazır; main'e alınması ve gerçek GitHub çalıştırması bekliyor |
 | Solo branch protection | GitHub'da uygulandı: PR zorunlu, onay sayısı 0, CODEOWNERS onayı kapalı, `validate` kaynağı GitHub Actions, branch güncel olmalı, kurallar admin'e de uygulanır, force push/silme kapalı |
 | Solo CODEOWNERS | Bu çalışma branch'inde repo sahibine göre düzenlendi ve üretim dosya deseni düzeltildi; merge yapılmadığı için remote main'de örnek kayıtlar duruyor |
-| GitHub Actions / OIDC çalıştırması | Son API kontrolünde workflow run sayısı `0`; gerçek GitHub token exchange henüz kanıtlanmadı |
+| GitHub Actions / OIDC çalıştırması | İlk kişisel PR çalışmasında `Azure login (OIDC)` ve `Validate` başarılı oldu. Yeni commit'ler için güncel kontrol sonucu ayrıca beklenir |
+| Drift başlangıç kontrolü | Bu çalışma branch'inde job düzeyinde opt-in koşulu var; main'e merge edilmeden main'deki eski workflow korunmuş sayılmaz |
 | MCP smoke kontrolleri | Kullanıcı dört gerçek araç çağrısını doğruladı: workspace ve kapasite listeleri, en az 6 iş yükü türü ve Lakehouse OpenAPI içeriği |
-| Tam Challenge 00 kabulü | Tamamlanmadı; canlı kontrol hazırlığı ve gerçek GitHub PR/workflow/OIDC denemesi bekliyor. İnsan hesabıyla MCP erişimi SPN girişini kanıtlamaz |
+| Tam Challenge 00 kabulü | Tamamlanmadı; canlı grup kontrolü hazırlığı, main'e merge ve onaylı dry-run provası bekliyor. Başarılı PR OIDC girişi tek başına Fabric API yazma yetkisini kanıtlamaz |
 
 **Yerel dosya değişikliği GitHub ayarı değildir.** GitHub branch koruması,
 CODEOWNERS dosyasının doğru branch'e ulaşması ve Actions'ın gerçek
 çalışması ayrı ayrı tamamlanmalıdır. Bu belgeyi yazmak bunları kendiliğinden
 uygulamaz.
 
-**Şu an beklenebilecek durum:** `main` koruması aktif, fakat `validate`
-henüz GitHub'da çalışmadığı için PR merge kontrolü sonuç bekleyebilir.
-Çözüm kuralı kaldırmak değil, çalışma branch'ini doğru fork'a gönderip
-hazırlanan workflow'u etkinleştirerek gerçek kontrol sonucunu üretmektir.
+**Şu an beklenebilecek durum:** `main` koruması aktiftir. Her yeni push
+sonrasında güncel commit için `validate` sonucu beklenebilir; önceki commit'in
+başarılı sonucu yeni değişikliklerin doğrulandığı anlamına gelmez.
 Bu bekleme, çalışma branch'ine push yapılmasını engellemez.
 
 ## 6. Müşteriye nasıl anlatılmalı?
