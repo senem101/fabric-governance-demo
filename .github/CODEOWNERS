@@ -1,14 +1,14 @@
-# Replace the placeholder handles below with your own team(s) or user(s),
-# e.g. @your-org/fabric-platform-team or @your-github-handle.
+# Solo-demo ownership metadata; required Code Owner approval is disabled.
+# Independent review requires a second person with repository write access.
 
 # Default reviewer for all changes
-*                       @your-org/fabric-governance-maintainers
+*                       @senem101
 
-# Policy / schema / scripts require platform owner review
-/rules/                 @your-org/fabric-governance-maintainers
-/schemas/               @your-org/fabric-governance-maintainers
-/scripts/               @your-org/fabric-governance-maintainers
-/.github/               @your-org/fabric-governance-maintainers
+# Explicit ownership for governance configuration
+/rules/                 @senem101
+/schemas/               @senem101
+/scripts/               @senem101
+/.github/               @senem101
 
-# Production workspace requests need extra scrutiny
-/workspaces/prd-*.yaml  @your-org/fabric-governance-maintainers
+# Production environment is a segment in the workspace name.
+/workspaces/*-prd-*.yaml @senem101

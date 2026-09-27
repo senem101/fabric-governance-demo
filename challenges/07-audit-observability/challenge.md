@@ -1,5 +1,7 @@
 # Challenge 07 — Audit & observability
 
+> **Türkçe coach rehberi:** [Adım adım eğitim, demo ve mevcut kodun sınırları](COACH-TR.md).
+
 > **Outcome:** every governance event (PRs, workflow runs, Fabric activity, drift
 > findings) lands in an Eventhouse, surfaces in a Power BI dashboard, and trips
 > Activator alerts when anomalies appear.

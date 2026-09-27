@@ -1,5 +1,7 @@
 # Challenge 02 — Items as code
 
+> Türkçe müşteri eğitimi: [Adım adım coach rehberi](COACH-TR.md) — mevcut kod ile geliştirme alıştırmalarını ayırır.
+
 > **Outcome:** governance now reaches down inside the workspace. Every lakehouse,
 > notebook, and warehouse exists because a manifest in `items/<workspace>/` was
 > reviewed via PR.

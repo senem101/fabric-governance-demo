@@ -1,5 +1,7 @@
 # Challenge 00 — Tenant, identity, and tooling setup
 
+> **Türkçe coach rehberi:** [Adım adım kurulum, demo ve güncel uygulama notları](COACH-TR.md).
+
 > **Outcome:** a Fabric tenant ready for RVAS (Real Value Acceleration Solutions), a service-principal identity wired to
 > GitHub via OIDC, and a dev box with the Fabric MCP servers and at least one Skill
 > for Fabric installed and verified.

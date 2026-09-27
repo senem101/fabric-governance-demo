@@ -1,5 +1,7 @@
 # Challenge 05 — Medallion architecture bootstrap
 
+> **Türkçe coach rehberi:** [Adım adım eğitim, demo ve mevcut kodun sınırları](COACH-TR.md).
+
 > **Outcome:** a single PR scaffolds a fully governed Bronze / Silver / Gold
 > lakehouse set with the right sensitivity labels, endorsement, and reference
 > notebooks — using the **`e2e-medallion-architecture`** Skill end-to-end.

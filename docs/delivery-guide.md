@@ -1,5 +1,9 @@
 # Delivery Guide — Agentic Governance Blueprint for Fabric
 
+> **Türkçe coach paketi:** [Coach el kitabı](tr/coach-el-kitabi.md) ve
+> [challenge rehberleri](tr/README.md), başlangıç seviyesinde kurulum adımlarını
+> ve hedeflenen özelliklerle mevcut uygulama arasındaki farkları açıklar.
+
 > **Audience:** facilitators, coaches, customer-engagement leads, and event
 > organizers who are running this blueprint as a workshop, RVAS (Real Value Acceleration Solutions), or guided
 > customer engagement.
