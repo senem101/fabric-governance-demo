@@ -134,8 +134,8 @@ PR102 açılış olayı olmadığından süre metriğine dahil edilmez; “0 dak
 
 ## 7. Workflow ve araç entegrasyonu
 
-- `validate.yml` PR path filtrelerine `audit/**`, `items/**`, `tests/**`,
-  `.github/workflows/audit-export.yml` ekleyin; yeni normalizasyon/test adımlarını çağırın.
+- Bu kopyadaki `validate.yml` tüm PR'larda çalışır; `audit/**`, `items/**`,
+  `tests/**` ve `.github/workflows/audit-export.yml` için yeni normalizasyon/test adımlarını çağırın.
 - Mevcut workspace validator audit dosyalarını doğrulamaz.
   Şema/mapping değişince tüm audit fixture testlerini çalıştırın.
 - Yeni `audit-export.yml`: başlangıçta yalnız `workflow_dispatch`, doğrulamadan sonra
@@ -146,8 +146,9 @@ PR102 açılış olayı olmadığından süre metriğine dahil edilmez; “0 dak
   `items/**`, `schemas/**`, `rules/**`, `scripts/**` ve kendi workflow yolu olsun.
 - OIDC her serviste aynı token/izin demek değildir; Power BI admin, Fabric item ve
   Eventstream ingestion kimliklerini endpoint başına eşleyin.
-- Mevcut `[self-hosted, fabric-gov]` Linux runner'ı ve korumalı environment kurulumunu
-  ortak rehberden tamamlayın. Güvenilmeyen PR koduna audit kimliği vermeyin.
+- Bu kopyadaki GitHub-hosted Linux (`ubuntu-latest`) runner seçimi ve korumalı
+  environment için [Challenge 00 rehberini](../00-setup/COACH-TR.md) kullanın.
+  Güvenilmeyen PR koduna audit kimliği vermeyin.
 - Kurulu skill kataloğundaki Eventhouse/Eventstream/Activator becerileri taslak üretmeye
   yardımcı olabilir; eski skill komut adlarını çalışır CI arayüzü kabul etmeyin.
 - GitHub manifestleri ile Fabric Git tanımlarını ayırın; item sync için ayrı adım gerekir.

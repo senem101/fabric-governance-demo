@@ -140,11 +140,16 @@ Repo yöneticisi, Actions'ı etkinleştirmeden önce şu hazırlıkları yapar:
 | `AZURE_TENANT_ID` | Kendi tenant GUID'niz |
 | `AZURE_CLIENT_ID` | Kendi uygulamanızın client GUID'si |
 | `FABRIC_CAPACITY_ID` | Gerçek Fabric kapasite GUID'si; aşağıdaki öncelik notuna bakın |
+| `DEFAULT_OWNER_UPN` | Orijinal kurulum listesi için demo sahibinin Entra kullanıcı oturum açma adı; mevcut kod kullanmaz |
 | `LIVE_CHECKS` | İlk provada `false` |
 | `DRY_RUN` | İlk provada **`true`**; canlıya bilinçli geçişte `false` |
 
-Eski rehberlerdeki `DEFAULT_OWNER_UPN` mevcut workflow/script tarafından
-kullanılmıyor. Bu değişkeni koyarak örnek owner'ın değişmesini beklemeyin.
+Orijinal Challenge 00'daki `DEFAULT_OWNER_UPN` değişkenini de ekleyin.
+Değerini **Entra ID > Users > ilgili kullanıcı > User principal name**
+alanından alın; GitHub kullanıcı adı veya SPN Object ID'si değildir.
+Mevcut workflow/script bu değişkeni kullanmaz; sahip atamaları manifestteki
+`owners` listesinden gelir. Değişkeni eklemek örnek owner'ı değiştirmez.
+UPN değerini public dosyalara veya loglara yazdırmayın.
 
 `rules\policy.yaml` içindeki `capacityId` şu an örnek `3333...` değeridir.
 **Gerçek GUID ile değiştirin.** Kod policy'deki dolu ID'yi variable'dan önce
@@ -187,39 +192,34 @@ girmeniz gerekebilir. Token'ın kendisini ekrana veya Chat'e yazdırmayın.
 
 **Güvenlik sınırı:** `pull_request` subject'i SPN'yi read-only yapmaz.
 Aynı SPN'ye yazma yetkisi verdiyseniz o kimliği kullanan PR kodu da yazabilir.
-Bu nedenle ilk eğitimde `LIVE_CHECKS=false` tutun; müşteri kopyasındaki
-`validate` workflow'unda Azure login adımını kaldırın ve `id-token: write`
-iznini kaldırın. PR canlı kontrolü gerekiyorsa ayrı, okuma amaçlı kimlik,
-ayrı değişkenler ve güvenilir PR politikası mühendislik ekibince hazırlanmalı.
-Hazır tek-SPN tasarımını production güvenlik modeli diye sunmayın.
+Bu çalışma kopyasında eğitim için **orijinal tek-SPN ve üç OIDC bağlantılı
+tasarım** korunur: PR Azure login adımı ve `id-token: write` izni kaldırılmaz.
+`production` onayı yalnız o environment'ı kullanan provision işini korur;
+PR ve main bağlantıları aynı yönetici kimliğine bu onayı beklemeden giriş
+sağlayabilir. `LIVE_CHECKS=false` yalnız canlı grup kontrolünü kapatır,
+OIDC girişini veya SPN'nin yetkilerini kaldırmaz.
+
+Kimliksiz PR doğrulaması ve yalnız onaylı canlı işler ayrı bir güvenlik
+alternatifidir; bu kopyada uygulanmamıştır. Hazır tek-SPN tasarımını
+production güvenlik modeli diye sunmayın.
 
 ## 9. Runner: komutları hangi bilgisayar çalıştıracak?
 
-Üç hazır workflow **`runs-on: [self-hosted, fabric-gov]`** kullanır; Python
-kurulumu Linux biçimindedir. Yeni fork'ta böyle bir runner yoksa job bekler.
+**Runner**, workflow dosyasındaki komutları çalıştıran bilgisayardır.
+GitHub-hosted runner, GitHub'ın iş için sağladığı geçici sanal makinedir;
+katılımcının bilgisayarına Linux veya runner kurması gerekmez. Bu makine
+Python scriptlerini çalıştırır; Fabric kapasitesinin yerine geçmez.
 
-**Başlangıç için**, kurum politikasının izin verdiği GitHub-hosted Linux runner:
+Orijinal kaynak workflow'ları **`runs-on: [self-hosted, fabric-gov]`**
+bekler. Bu çalışma kopyasındaki `.github\workflows\validate.yml`,
+`provision.yml` ve `drift.yml` ise **`runs-on: ubuntu-latest`** kullanır.
+Üçüne de Linux sanal ortamı oluşturulmadan önce Python `3.12` hazırlığı
+eklenmiştir. Mevcut action sürümleri, OIDC izinleri ve `production`
+environment onayı korunur. Zorunlu PR kontrolü için `validate` kapsamı
+ve hata davranışı ayrıca uyarlanmıştır; ayrıntı 10. bölümdedir.
 
-1. Kendi müşteri kopyanızda bir hazırlık branch'i açın.
-2. `.github\workflows\validate.yml`, `provision.yml`, `drift.yml` dosyalarının
-   her birinde `runs-on: [self-hosted, fabric-gov]` satırını
-   `runs-on: ubuntu-latest` yapın. Diğer action sürümlerini değiştirmeyin.
-3. Her dosyada **Setup Python venv** adımından önce kurumun onayladığı
-   `actions/setup-python` sürümünü ekleyip Python `3.12` seçin; action'ı
-   repo politikasına göre gözden geçirilmiş tam commit SHA'sına sabitleyin.
-   Aşağıdaki örnek, rehber hazırlanırken `v6` için doğrulanan SHA'yı kullanır;
-   müşterinizin izinli action listesine uygunluğunu ayrıca kontrol edin.
-4. `validate` komutundan `--changed-only` seçeneğini kaldırıp
-   `python scripts/validate.py` kullanın. Böylece policy/schema değişince
-   bütün mevcut manifestler tekrar sınanır.
-5. `provision` içine, kaynak yazma adımından önce aynı tam doğrulama komutunu
-   ekleyin. Mevcut provisioner kendi başına schema/policy kontrolü yapmaz.
-6. İlk PR kontrolünü Azure kimliği olmadan çalıştırmak için 8. adımdaki
-   validate login/OIDC düzenlemesini uygulayın.
-7. Hazırlık PR'ını repo yöneticisine inceletip birleştirin.
-   `DRY_RUN=true` ve environment gate önceden hazır olmalı.
-
-`steps:` altında diğer `- name:` satırlarıyla aynı hizaya eklenecek Python adımı:
+Üç dosyada da bulunan Python hazırlığı, doğrulanan `actions/setup-python`
+`v6` commit'ine sabitlenmiştir:
 
 ```yaml
       - name: Set up Python
@@ -228,7 +228,20 @@ kurulumu Linux biçimindedir. Yeni fork'ta böyle bir runner yoksa job bekler.
           python-version: '3.12'
 ```
 
-`provision.yml` içinde **Provision workspaces** adımının hemen önüne eklenecek kontrol:
+**Etkinleştirmeden önce:**
+
+1. Kurumun GitHub-hosted runner ve kullanılan action'lara izin verdiğini doğrulayın.
+2. Repo değişkenlerini, üç OIDC bağlantısını ve seçilen ekip/solo onay modelini hazırlayın.
+3. `DRY_RUN=true` ile `production` environment onay/branch kurallarını kontrol edin.
+4. Yerel dosya değişikliği GitHub'daki workflow'u güncellemez. Hazırlık branch'ini
+   doğru fork'a gönderme, inceleme ve birleştirme adımlarını ayrıca tamamlayın.
+5. Actions'ı bu hazırlıklardan sonra etkinleştirin; özellikle `drift` raporunun
+   public repo'da hangi bilgileri yayımlayacağını önceden değerlendirin.
+
+**Henüz uygulanmayan ek iyileştirme:** Provision'dan hemen önce schema/policy
+doğrulaması eklemek. PR workflow'u artık bütün workspace manifestlerini
+kontrol eder; ancak provisioner bu kontrolü kendi başına yapmaz.
+**Provision workspaces** öncesi için önerilen örnek:
 
 ```yaml
       - name: Validate all workspace manifests
@@ -241,32 +254,40 @@ kurulumu Linux biçimindedir. Yeni fork'ta böyle bir runner yoksa job bekler.
 Bu bloklar tam workflow dosyası değildir; mevcut `on`, `permissions`,
 checkout, Azure login ve environment bölümlerinin yerine yapıştırmayın.
 
-Bunlar **müşteri kopyasında yapılacak hazırlık değişiklikleridir**; bu Türkçe
-rehberin eklenmesi orijinal workflow'ları değiştirmez.
 Hosted runner dakikaları/billing ve ağ erişimi kurum tarafından onaylanmalıdır.
 
 Kurum self-hosted istiyorsa yönetici **Settings > Actions > Runners > New
-self-hosted runner** yolundan **ayrı Linux** makine kaydeder; `fabric-gov`
-etiketi, Python 3.12+, venv/pip, Git ve Azure CLI hazır olmalıdır.
+self-hosted runner** yolundan **ayrı Linux** makine kaydeder ve ilgili
+workflow'larda `runs-on: [self-hosted, fabric-gov]` seçer. `fabric-gov`
+etiketi, venv/pip, Git ve Azure CLI hazır olmalı; makine Python hazırlığı için
+kullanılan action'ın güncel runner gereksinimlerini de karşılamalıdır.
 Katılımcının günlük iş bilgisayarını veya ortak production sunucusunu runner
 yapmayın. Güvenilmeyen public fork PR'larını self-hosted runner'da çalıştırmayın.
 
 ## 10. Review ve branch koruması
 
-1. `.github\CODEOWNERS` içindeki `@your-org/...` yer tutucularını gerçek,
-   repo'da write yetkisi olan kullanıcı/takımla değiştirin.
-2. Eski `/workspaces/prd-*.yaml` üretim deseni güncel altı parçalı adları
-   yakalamaz. Gerçek ihtiyaca göre örneğin `/workspaces/*-prd-*.yaml`
-   desenini ve sorumlusunu gözden geçirin.
-3. GitHub **Settings > Rules > Rulesets** veya **Branches > Branch protection**
-   üzerinden `main` için PR, en az bir review ve CODEOWNERS onayı isteyin.
-4. `validate` ilk kez çalıştıktan sonra görünen gerçek check adını required
-   check olarak seçin. Sadece doküman PR'larında path filtresi yüzünden
-   çalışmayabileceğini repo yöneticisiyle çözün.
-5. Force push ve silmeyi engelleyin; yetkili reviewer'ın PR merge edebildiğini
-   doğrulayın. “Sadece Actions push etsin” diye insan onaylı merge'i yanlışlıkla
-   kullanılamaz hale getirmeyin.
-6. **Actions** sekmesinde gerekiyorsa workflow'ları etkinleştirin.
+**Bu demo için solo uyarlaması:** PR ve `validate` zorunludur; bağımsız
+PR/CODEOWNERS onayı aranmaz. Orijinalden farklar ve yerel/remote uygulama
+durumu [solo demo karşılaştırmasında](../../docs/tr/solo-demo-farklari.md)
+ayrı tutulur. Solo demo, push veya GitHub Actions kullanımını yasaklamaz.
+
+1. Yerel `.github\CODEOWNERS` repo sahibini gösterir; üretim deseni
+   `/workspaces/*-prd-*.yaml` olarak düzeltilmiştir. Bu dosya tek başına
+   zorunlu onay oluşturmaz ve GitHub'a gönderilmeden remote main'i değiştirmez.
+2. GitHub'da `main` için PR zorunlu, gereken onay sayısı `0`, CODEOWNERS
+   ve son push için başka kişi onayı kapalıdır. Bu bağımsız inceleme değildir.
+3. Gerekli check `validate`, beklenen kaynak GitHub Actions'tır.
+   Branch'in main ile güncel olması gerekir. Check henüz çalışmadıysa
+   merge bekler; çalışma branch'ine push engellenmez.
+4. Kurallar repo yöneticisine de uygulanır. `main` için force push ve silme
+   kapalıdır; “yalnız Actions merge etsin” kısıtı yoktur.
+5. Yerel `validate.yml` artık path filtresi olmadan tüm PR'larda bütün
+   workspace manifestlerini doğrular. Azure login hatası işi başarısız yapar.
+   Rapor üretilemediyse sticky comment adımı çalışmaz; asıl hata gizlenmez.
+6. Orijinal ekip kurulumuna geçerken ikinci reviewer'a write erişimi verin,
+   gerçek CODEOWNERS eşleşmelerini hazırlayın ve en az bir PR/CODEOWNERS
+   onayını zorunlu hale getirin.
+7. **Actions** sekmesinde gerekiyorsa workflow'ları etkinleştirin.
    `drift` zamanlamasını gerçek kimlik/izin hazır olmadan açmayın.
    Issues özelliği ve `drift`, `governance` etiketleri de hazır olmalı.
 
@@ -284,7 +305,7 @@ GitHub hesabı, Entra kullanıcısı, Actions service principal'ı.
 | Local MCP: “API belgesi bulunan Fabric iş yüklerini listele” | Sunucunun mevcut dokümantasyon kataloğu; sabit araç sayısı beklemeyin |
 | Local MCP: “Lakehouse API belgelerini göster” | Dokümantasyon aracı; kaynak yazımı yok |
 | Kurulu skill ile çalıştırılmayan taslak | Skill'in yüklendiği ve taslağın gözden geçirildiği görülebilir |
-| Kendi repo'nuzda manifest PR'ı | Validate raporu ve doğru reviewer |
+| Kendi repo'nuzda manifest PR'ı | Validate raporu ve seçilen ekip/solo onay modeline uygun merge kontrolü |
 | Onaylı `production` job'ı, `DRY_RUN=true` | Azure login başarılı, dry-run logları; bu henüz Fabric API yazma testi değil |
 
 Canlı workspace oluşturma ve SPN'nin Fabric yetkisini doğrulama 01'de yapılır.
@@ -305,7 +326,7 @@ Henüz uygulanmayan kontrolleri işaretle. Dosya değiştirme ve canlı araç ç
 | Job `Queued / Waiting for runner` | Runner etiketi ve çevrimiçi durumu |
 | Job `Waiting for approval` | Environment reviewer; bu normal bir bekleme olabilir |
 | `AADSTS70021` / federated credential eşleşmiyor | Issuer, audience, gerçek `sub`, immutable ID'ler, environment harfleri |
-| Azure login hata verdi ama validate yeşil | Mevcut workflow'da login `continue-on-error`; canlı kimlik doğrulanmış sayılmaz |
+| Azure login hata verdi ama validate yeşil | Eski workflow sürümünü çalıştırıp çalıştırmadığınızı kontrol edin; bu kopyada login hatası işi durdurur |
 | Fabric `403` | SPN grup üyeliği, tenant ayarı, kapasite ve workspace rolü |
 | Gerçek capacity variable'ı var ama yanlış ID kullanılıyor | Policy'deki örnek `capacityId` daha öncelikli |
 | Review istenmiyor | CODEOWNERS base branch'te mi, gerçek takımın write yetkisi var mı, PR draft mı? |

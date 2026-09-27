@@ -132,11 +132,10 @@ Mevcut provisioner item tanımı, label, endorsement veya izin kaldırma işlemi
 
 ## 7. GitHub workflow bağlantısı: etiket tek başına yeterli değil
 
-- `validate.yml` PR path filtrelerine `pipelines/**`, `items/**`, `tests/**`,
-  `.github/workflows/promote.yml` ekleyin.
-  Mevcut `schemas/**`, `rules/**`, `scripts/**` filtreleri korunur.
+- Bu kopyadaki `validate.yml` tüm PR'larda çalışır; `pipelines/**`, `items/**`,
+  `tests/**` ve `.github/workflows/promote.yml` değişiklikleri de tetikler.
 - Yeni pipeline validator ve test adımlarını ayrıca ekleyin;
-  `validate.py --changed-only` yalnız workspace manifestlerini seçer.
+  Mevcut `validate.py` yalnız workspace manifestlerini doğrular.
 - Güvenli ilk sürüm: `promote.yml` içinde korumalı main'den `workflow_dispatch`;
   input olarak onaylı pipeline, stage ve merge edilmiş release SHA seçilsin.
   Dispatch'in path filtresi yoktur; input allow-list ve SHA kontrolü gerekir.
@@ -151,7 +150,7 @@ Mevcut provisioner item tanımı, label, endorsement veya izin kaldırma işlemi
   `workspaces/**`, `schemas/**`, `rules/**`, `scripts/**` ve kendi workflow yolu olsun.
 - Kaynak workspace sync/uygulama, test ve promotion arasında bağımlılık kurun.
   GitHub merge ile Fabric “Update from Git” veya API sync ayrı işlemlerdir.
-- Mevcut `[self-hosted, fabric-gov]` runner Linux shell varsayar.
+- Bu kopyadaki mevcut workflow'lar GitHub-hosted `ubuntu-latest` ve Python 3.12 kullanır; adımlar Linux shell varsayar.
   Ortak kurulumdaki güvenli fork/runner adımlarını tamamlamadan canlı job açmayın.
 
 ## 8. Canlı demo ve geri alma

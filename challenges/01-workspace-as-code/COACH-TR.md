@@ -254,7 +254,7 @@ doğrulama tamam; canlı provision ve drift denenmedi”** yazın.
 | Owner rolü oluşmadı | Log uyarısı, Object ID, SPN workspace yetkisi; green job'a güvenmeyin |
 | UPN atlandı | Yerel kullanıcı adı değil Entra Object ID kullanın; Graph erişimi ayrıca gerekir |
 | PR kontrolü hiç çalışmadı | `.yaml` dosyasının `workspaces` altında olduğunu ve path filtresini kontrol edin |
-| Policy değişti ama dosyalar sınanmadı | 00'daki tam doğrulama hazırlığını yapın; `--changed-only` sınırını hatırlayın |
+| Policy değişti ama dosyalar sınanmadı | Çalışan workflow sürümünü kontrol edin; bu kopyanın CI işi tüm workspace manifestlerini doğrular, eski `--changed-only` çağrısı aynı kapsamı sağlamaz |
 | Workspace var ama ben göremiyorum | Kendi Entra hesabınız/tenant'ınız ve grup üyeliğiniz |
 
 **“Label alanı var; hassasiyet etiketi uygulandı mı?”** Hayır. Bu aşamada

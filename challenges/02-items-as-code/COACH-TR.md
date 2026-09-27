@@ -156,13 +156,13 @@ Coach incelemesinde şu sırayı izleyin:
    **GitHub → Pull requests → New pull request** ekranında base repo'nun eğitim fork'u olduğunu doğrulayın.
 3. PR açıklamasına “yerel doğrulama”, “mock test”, “canlı doğrulama yapılmadı” bölümlerini ekleyin.
    PR açmak ve birleştirmek farklıdır; müşteri reviewer'ı incelemeden merge etmeyin.
-4. Mevcut `validate.yml` filtrelerinde `items/**` yoktur; yalnız item değişen PR otomatik denetlenmeyebilir.
-   `--changed-only` yalnız workspace değişikliği arar; workflow'u tetiklemek tek başına item kontrolü sağlamaz.
+4. Bu kopyadaki `validate.yml` tüm PR'larda çalışır, ancak mevcut script yalnız workspace manifestlerini doğrular.
+   Workflow'un item değişikliğinde tetiklenmesi tek başına item kontrolü sağlamaz.
 5. Yeni `items.yml` **OLUŞTURULACAK**; gerçek veri yolu, şema, validator, policy ve test değişikliklerini kapsamalı.
    Starter dosyaları root `items/` dizinine taşınacaksa bu sözleşmeyi ve referans çözümünü açıkça belirleyin.
 6. `provision.yml`'de item yolu ve item uygulama adımı yok; bunlar **OLUŞTURULACAK**.
    Canlı merge'den önce required checks, deployment environment onayı ve doğru hedef workspace zorunlu olmalı.
-7. Mevcut workflow'lar `[self-hosted, fabric-gov]` ve Linux `.venv/bin` kullanır; canonical Actions hazır servis değildir.
+7. Bu kopyadaki mevcut workflow'lar GitHub-hosted `ubuntu-latest`, Python 3.12 ve Linux `.venv/bin` kullanır; canonical Actions hazır servis değildir.
    Runner/izolasyon için [ilk kurulumu](../../docs/tr/ilk-kurulum.md) izleyin; Windows terminal komutunu workflow'a aynen taşımayın.
 
 ## 8. Canlı ortam varsa: yalnız onaylı, salt okunur doğrulama

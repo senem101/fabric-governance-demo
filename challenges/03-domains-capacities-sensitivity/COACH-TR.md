@@ -187,9 +187,9 @@ Endpoint/kimlik desteğini resmi belgeye bağla; destek kanıtı yoksa canlı ad
 1. **VS Code → Source Control → dosya farkı**: sahte kimlikler, yanlış tenant veya kapsam genişlemesini birlikte inceleyin.
 2. Eğitim fork'una dal yayınlayın → **GitHub → Pull requests → New pull request**.
    Taslak PR'da çalıştırılan yerel testleri ve henüz uygulanmamış entegrasyonu açıkça yazın.
-3. Mevcut `validate.yml` `domains/**`/`capacities/**` yollarını izlemez.
-   İzlenen policy/schema değişikliği olsa bile `--changed-only` yalnız workspace dosyalarını seçer.
-   Policy değişince **tüm ilgili workspace'leri** tekrar kontrol eden kapsam ve yeni manifest validatorleri geliştirilmelidir.
+3. Bu kopyadaki `validate.yml` tüm PR'larda bütün workspace manifestlerini kontrol eder.
+   `domains/**`/`capacities/**` değişikliğinin workflow'u tetiklemesi bu yeni manifestlerin doğrulandığı anlamına gelmez.
+   Domain/kapasite validatorleri ve bunların bağımlılık kontrolleri ayrıca geliştirilmelidir.
 4. `provision.yml` bu yeni yolları/uygulamaları içermez; mevcut kapasite ataması hata verirse warning ile devam edebilir.
    Sahte `capacityId` policy'de dururken yalnız `FABRIC_CAPACITY_ID` değişkenini doldurmak çözmez: policy'deki ID önce gelir.
 5. `CODEOWNERS` YAML içeriğine göre etiket değişimini anlayamaz; dosya yoluna göre çalışır.
@@ -199,8 +199,8 @@ Endpoint/kimlik desteğini resmi belgeye bağla; destek kanıtı yoksa canlı ad
    Birden çok owner yazmak her ekibin ayrı onayını garanti etmez; platform **ve** güvenlik onayı için ek süreç/check tasarlayın.
 7. Etiketi düşürme veri açığa çıkma riski, yükseltme erişim/iş akışı etkisi yaratabilir; ikisini de inceleyin.
    Mevcut kodda etiket değişimi için özel karşılaştırma/onay kapısı yoktur.
-8. `[self-hosted, fabric-gov]` runner ve Linux sanal ortamı beklenir; canonical Actions çalışır demo değildir.
-   Ayrı runner, environment onayı ve güvenli etkinleştirme için [ortak kurulumu](../../docs/tr/ilk-kurulum.md) kullanın.
+8. Bu kopyada GitHub-hosted `ubuntu-latest`, Python 3.12 ve Linux sanal ortamı kullanılır; canonical Actions çalışır demo değildir.
+   Runner seçimi, environment onayı ve güvenli etkinleştirme için [Challenge 00 kurulumunu](../00-setup/COACH-TR.md) kullanın.
 
 ## 9. Kabul, hata ayıklama ve kapanış
 

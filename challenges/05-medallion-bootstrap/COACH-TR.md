@@ -137,10 +137,10 @@ Para birimi dönüşümü bu küçük kapsamda yoktur; farklı currency gelirse 
 
 ## 7. GitHub/Actions entegrasyonu: mutlaka eklenecek
 
-- `validate.yml` → `on.pull_request.paths` listesine `medallion/**`, `items/**`,
-  `notebooks/**`, `tests/**` ekleyin; mevcut `schemas/**`, `rules/**`, `scripts/**` korunsun.
-- Sadece path filtresi yetmez: yeni validator/test adımlarını çağırın.
-  Mevcut `validate.py --changed-only` yalnız `workspaces/` dosyalarını seçer.
+- Bu kopyadaki `validate.yml` path filtresi olmadan tüm PR'larda çalışır;
+  `medallion/**`, `items/**`, `notebooks/**`, `tests/**` değişiklikleri de tetikler.
+- Tetiklenmek yeterli değildir: yeni validator/test adımlarını çağırın.
+  Mevcut `validate.py` yalnız workspace manifestlerini doğrular.
 - Policy/şema/notebook değiştiğinde bütün bağımlı medallion dosyalarını yeniden doğrulayın.
   “No workspace manifests changed” medallion doğrulama kanıtı değildir.
 - Yeni `.github/workflows/medallion.yml` için korumalı `main` push veya manuel dispatch seçin.
@@ -150,7 +150,7 @@ Para birimi dönüşümü bu küçük kapsamda yoktur; farklı currency gelirse 
   iki workflow'un aynı anda aynı nesneyi oluşturmasını engelleyin.
 - Üretim job'ı `production` environment, gerçekten yapılandırılmış reviewer,
   OIDC, kısıtlı branch ve güvenilir runner gerektirir. PR kodunu ayrıcalıklı runner'da çalıştırmayın.
-- Mevcut runner etiketleri `[self-hosted, fabric-gov]`; adımlar Linux shell varsayar.
+- Bu kopyadaki mevcut workflow'lar GitHub-hosted `ubuntu-latest` ve Python 3.12 kullanır; adımlar Linux shell varsayar.
   Windows terminal komutlarını workflow'a olduğu gibi taşımayın.
 - GitHub merge, Fabric Git eşitlemesi değildir. Git kullanılıyorsa desteklenen item
   tanımları için ayrı bağlantı ve “Update from Git”/onaylı sync adımı gerekir.

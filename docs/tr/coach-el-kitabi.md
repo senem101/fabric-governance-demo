@@ -41,14 +41,19 @@ müşteri demosundan önce yeniden kontrol edin.
 | Hata davranışı | Bazı kapasite/rol hataları yalnız uyarı; UPN çözülemezse atlanabilir | “Yeşil job tek başına başarılı dağıtım kanıtı değil.” |
 | Canlı grup kontrolü | `LIVE_CHECKS=true` Graph kontrolünü açar; bazı hatalar uyarıya dönüşür | “PASS, grup varlığının mutlaka doğrulandığı anlamına gelmez.” |
 | Kotalar | Policy'de kota değerleri var; mevcut kural motoru bunları uygulamaz | “Tanımlı kota, çalışan kota kontrolü demek değil.” |
-| CI kapsamı | `validate --changed-only` yalnız değişen workspace dosyalarını seçer | “Sadece policy değişirse tüm manifestler kendiliğinden yeniden sınanmaz.” |
+| CI kapsamı | Bu kopyada `validate` tüm PR'larda bütün workspace manifestlerini doğrular | “Policy/schema değişikliği de tüm workspace'lere uygulanır; yeni kaynak ailelerinin validator'ları hâlâ eklenmelidir.” |
 | Yeni kaynak türleri | 02-08'in birçok schema, script ve workflow'u mevcut değil | “Bunlar geliştirme atölyesi görevleri.” |
 | İsim örnekleri | Kod altı parçalı ad ister; eski `dev-plt-...` örnekleri uyumsuz | “Şemanın istediği güncel adı kullanıyoruz.” |
-| CODEOWNERS | Örnek takım adları var; `prd-*.yaml` güncel adları yakalamaz | “Gerçek reviewer ve doğru dosya deseniyle uyarlayacağız.” |
-| Runner | Üç yönetişim workflow'u `self-hosted, fabric-gov` etiketini bekler | “Workflow dosyası bulunması, çalıştıracak makine olduğu anlamına gelmez.” |
+| CODEOWNERS | Yerel dosyada repo sahibi ve `*-prd-*.yaml` deseni var; solo kurulumda owner onayı zorunlu değil | “Dosya sahipliği ile bağımsız onay farklıdır; ekipli kurulum için ikinci reviewer gerekir.” |
+| Runner | Bu kopyada üç yönetişim workflow'u GitHub-hosted `ubuntu-latest` ve Python 3.12 kullanır | “Runner komutları çalıştıran geçici makinedir; Fabric kapasitesi değildir. GitHub'a gönderme ve etkinleştirme ayrı adımlardır.” |
 | Onay sınırı | Aynı SPN PR ve provision'da kullanılabilir; OIDC subject izni daraltmaz | “Production için okuma/yazma kimliklerini ve güven sınırını ayırmalıyız.” |
 
 **Kaynakları açıp gösterin:**
+
+Tek kişiyle yapılan eğitim için [solo demo ile orijinal tasarım farklarını](solo-demo-farklari.md)
+ayrıca okuyun. Bu belge onaylanan istisnaları, push/Actions kullanımını ve
+henüz uygulanmamış kararları birbirinden ayırır.
+
 [şema](../../schemas/workspace.schema.json),
 [policy](../../rules/policy.yaml),
 [validator](../../scripts/validate.py),

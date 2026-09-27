@@ -87,8 +87,8 @@ bildirim açma, prd terfisi ve cleanup.
 - Certification yetkili reviewer'ı, Purview lisans/ayar sahibi ve audit okuma kimliği mevcut
   veya bu kısımlar açıkça kapsam dışı.
 - GitHub environment reviewers gerçekten yapılandırılmış; YAML'daki isim yeterli değil.
-- Güvenilir runner çevrimiçi: mevcut workflow adımları Linux self-hosted
-  `[self-hosted, fabric-gov]` bekler. Canonical repoda canlı çalışma varsaymayın.
+- Bu kopyada mevcut workflow'lar GitHub-hosted Linux (`ubuntu-latest`) ve Python 3.12
+  kullanır; Actions izinleri ve ağ erişimi hazır olmalı. Canonical repoda canlı çalışma varsaymayın.
 - Müşteri verisi, gerçek erişim token'ı, sertifika veya bağlantı sırrı repo/Copilot girdisi değil.
 
 ## 6. Öğrenci adımları: birleşik teslimi hazırlayın
@@ -145,11 +145,10 @@ Manifest klasörü ile Fabric Git'in yerel item definition formatı aynı şey d
 
 **Workflow kontrol listesi:**
 
-1. `validate.yml` PR filtreleri seçilen `items/**`, `domains/**`, `capacities/**`,
-   `access/**`, `medallion/**`, `notebooks/**`, `agents/**`, `audit/**`,
-   `pipelines/**`, `tests/**` ve ilgili yeni workflow yollarını kapsasın.
-2. Her yeni aile için gerçek validator/test adımı eklensin; path filtresi tek başına yetmez.
-   Mevcut `--changed-only` yalnız workspace'leri tarar.
+1. Bu kopyadaki `validate.yml` tüm PR'larda çalışır; seçilen yeni kaynak
+   ailelerinin ve test/workflow dosyalarının değişmesi de kontrolü tetikler.
+2. Her yeni aile için gerçek validator/test adımı eklensin; tetiklenmek tek başına yetmez.
+   Mevcut `validate.py` yalnız workspace manifestlerini doğrular.
 3. Schema/policy değişiminde bütün bağımlı manifestler doğrulansın.
    “Dosya değişmedi” nedeniyle etkilenmiş aileyi atlamayın.
 4. Main push tabanlı yeni uygulama workflow'ları aynı ilgili dizinler, `workspaces/**`,

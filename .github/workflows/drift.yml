@@ -1,12 +1,7 @@
 name: drift
 
-# ── Blueprint reference workflow — dormant in the canonical public repo ──────────────
-# Scheduled drift detection on a customer-provided [self-hosted, fabric-gov] runner via
-# Azure OIDC. The canonical public repo has no such runner, so this workflow is DISABLED
-# in repo settings (Actions tab) to avoid a daily run that queues forever.
-# To use in a real delivery: fork/clone, register the runner + set the required repo
-# variables (Azure OIDC client/tenant, Fabric capacity), then Actions → drift → "Enable".
-# ─────────────────────────────────────────────────────────────────────────────────────
+# Keep this GitHub-hosted workflow disabled until OIDC and SPN access are ready
+# and the report contents are approved for publication in the target repository.
 
 on:
   schedule:
@@ -20,9 +15,14 @@ permissions:
 
 jobs:
   drift:
-    runs-on: [self-hosted, fabric-gov]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
 
       - name: Setup Python venv
         run: |

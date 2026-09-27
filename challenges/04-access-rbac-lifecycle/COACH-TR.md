@@ -188,8 +188,8 @@ removal planlama. İzin iptalini yalnız PR açılmış olmasına dayanarak baş
 
 1. **Source Control → dosya farkı** ekranında müşteriyle dosyaları inceleyin; yalnız lab değişikliklerini stage/commit edin.
    Eğitim dalını yayınlayın → **GitHub → Pull requests → New pull request**; base repo eğitim fork'u olmalı.
-2. Mevcut `validate.yml` `access/**` yolunu izlemez; `--changed-only` access dosyasını bulmaz.
-   Access manifesti/şeması/validator/policy testlerini kapsayan path filtreleri ve gerçek validation adımı **OLUŞTURULACAK**.
+2. Bu kopyadaki `validate.yml` tüm PR'larda çalışır, ancak mevcut workspace validator'ı access dosyalarını doğrulamaz.
+   Access manifesti/şeması/validator/policy testlerini kapsayan gerçek validation adımı **OLUŞTURULACAK**.
 3. Mevcut `provision.yml` access klasörünü veya expiry işlemini kullanmaz.
    Uygulama, environment onayı ve ayrı live verification eklenmeden merge “rol güncellendi” sayılmaz.
 4. `.github/workflows/access-review.yml` **OLUŞTURULACAK**:
@@ -202,7 +202,7 @@ removal planlama. İzin iptalini yalnız PR açılmış olmasına dayanarak baş
 7. **Follow-up PR açmak erişimi geri almaz.** PR onay/merge/apply bekliyorsa yetki devam eder.
    Kesin 24 saat sınırı isteniyorsa müşterinin önceden onayladığı zaman sınırlı erişim sistemi gerekir; lab otomasyonu bunu garanti etmez.
 8. Acil durum sürecini normal PR kuyruğuna bağımlı hale getirmeyin; kurumsal break-glass/PIM politikası ve lisansı ayrıca değerlendirilir.
-9. Workflow'lar bugün `[self-hosted, fabric-gov]` ile Linux `.venv/bin` bekler; canonical Actions hazır çalışan servis değildir.
+9. Bu kopyadaki workflow'lar GitHub-hosted `ubuntu-latest`, Python 3.12 ve Linux `.venv/bin` kullanır; canonical Actions hazır çalışan servis değildir.
    Runner, OIDC ve güvenli enable adımları [ortak kurulumdadır](../../docs/tr/ilk-kurulum.md); dersi kurtarmak için tenant admin izni vermeyin.
 
 ## 9. Canlı ortam mevcutsa: yalnız rol listesini okuyun

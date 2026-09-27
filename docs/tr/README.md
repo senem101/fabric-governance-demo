@@ -14,6 +14,7 @@ Challenge 00 ve 01'i yalnızca eğitim ortamında kendiniz prova edin.
 |---|---|
 | [Coach el kitabı](coach-el-kitabi.md) | Müşteri görüşmesi, kapsam seçimi, anlatım, ajanda, prova ve teslim |
 | [İlk kurulum](ilk-kurulum.md) | GitHub/Git, VS Code, Copilot, Python, MCP ve Skills'i sıfırdan öğrenme |
+| [Solo demo ile orijinal tasarım farkları](solo-demo-farklari.md) | Tek kişilik demoda korunan kontroller, onay istisnaları, push/Actions akışı ve henüz tamamlanmayan işler |
 | [00 - Ortam, kimlik ve araçlar](../../challenges/00-setup/COACH-TR.md) | Yöneticiyle birlikte GitHub Actions ve Fabric bağlantısını hazırlama |
 | [01 - Workspace as code](../../challenges/01-workspace-as-code/COACH-TR.md) | Mevcut kodla doğrulama, PR, onay, oluşturma ve drift demosu |
 | [02 - Items as code](../../challenges/02-items-as-code/COACH-TR.md) | Lakehouse, notebook ve warehouse için otomasyon geliştirme |

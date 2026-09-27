@@ -128,10 +128,10 @@ PR kuralı tek başına portalda agent oluşturmayı tenant genelinde engellemez
    desteklediğini varsaymayın. Aracın mevcut şemasını okuyun.
 4. En az yetkiyle idempotent uygulama ve desteklenmeyen auth için kapalı hata tasarlayın.
    Kaynak izinlerini otomatik genişletmek bir “düzeltme” adımı olmasın.
-5. `validate.yml` → `on.pull_request.paths` listesine `agents/**`, `items/**`,
-   `tests/**` ekleyin; `rules/**`, `schemas/**`, `scripts/**` zaten kapsanır.
+5. Bu kopyadaki `validate.yml` tüm PR'larda çalışır; `agents/**`, `items/**`,
+   `tests/**` değişikliklerinin de gerekli kontrolleri çağırdığını doğrulayın.
 6. Workflow'a agent validator ve instruction linter adımlarını gerçekten ekleyin.
-   `validate.py --changed-only` agent dosyalarını seçmez.
+   Mevcut `validate.py` agent dosyalarını doğrulamaz.
    Item, policy veya instructions değişince bağımlı agent'ları yeniden doğrulayın.
 7. Uygulama için yeni `.github/workflows/agents.yml` seçerseniz güvenilir `main`
    push filtreleri: `agents/**`, `items/**`, `workspaces/**`, `schemas/**`,
@@ -141,7 +141,7 @@ PR kuralı tek başına portalda agent oluşturmayı tenant genelinde engellemez
    PR etiketini doğrudan ayrıcalıklı uygulama izni saymayın.
 9. Drift'e agent source set ve normalize edilmiş instruction hash karşılaştırması ekleyin.
    `drift.py` bugün bunları kontrol etmez; erişilemeyen tanımı eşit kabul etmeyin.
-10. Actions'ın Linux self-hosted runner varsayımını koruyun veya bilinçli uyarlayın.
+10. Bu kopyadaki mevcut workflow'ların GitHub-hosted Linux (`ubuntu-latest`) ve Python 3.12 seçimini yeni işlerde de değerlendirin.
     GitHub'da dosyanın bulunması Fabric'e Git sync veya agent publish yapılmış demek değildir.
 
 ## 7. Canlı demo: uygulama hazırsa
