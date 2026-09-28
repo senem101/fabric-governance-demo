@@ -19,6 +19,6 @@ owners:
     role: Admin
   - principalType: User
     identifier: d7ea0aa0-13bc-423b-9815-2bb22e2b3b27   # Approved demo user Object ID.
-    role: Member
+    role: Admin
 tags:
   purpose: coach-training
