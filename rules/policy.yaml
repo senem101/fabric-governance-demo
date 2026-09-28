@@ -4,11 +4,11 @@
 
 approvedCapacities:
   # logical name -> { capacityId, region, allowedEnvironments, sku }
-  contoso-f2-northeurope:
-    capacityId: "33333333-3333-3333-3333-333333333333"
-    region: northeurope
+  senem2fabric:
+    capacityId: "65AEB532-6F4D-4442-8BFD-1E1E8E795894"
+    region: westeurope
     allowedEnvironments: [poc, dev, sit, uat, stg, prd]
-    sku: F2
+    sku: F64
 
 # 19 approved domains. All workspace manifests must reference one of these.
 approvedDomains:
@@ -56,6 +56,7 @@ approvedSubjects:
 
 # ISO 3166-1 Alpha-2 country codes accepted in segment 1 of workspace name.
 approvedCountries:
+  - tr   # Turkey
   - pt   # Portugal
   - fr   # France
   - es   # Spain

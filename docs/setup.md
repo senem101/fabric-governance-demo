@@ -55,7 +55,7 @@ Azure/Fabric portal. Verify in Azure Portal → Microsoft Fabric → Capacities
 ## Day-1 smoke test
 
 1. Branch from `main`.
-2. Add `workspaces/pt-nlyt-sample-ndf-dev-hello1.yaml` (sample provided).
+2. Add `workspaces/tr-nlyt-sample-ndf-dev-hello1.yaml` (sample provided).
 3. Open PR — `validate` workflow should post a sticky comment with results.
 4. Approve & merge — `provision` workflow runs (after manual environment approval).
 5. Workspace appears in Fabric.

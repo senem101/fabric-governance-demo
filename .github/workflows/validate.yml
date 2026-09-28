@@ -31,8 +31,8 @@ jobs:
           .venv/bin/pip install --quiet -r scripts/requirements.txt
           echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
 
-      - name: Test live group validation
-        run: python -m unittest discover -s tests -p "test_live_group_validation.py"
+      - name: Test governance scripts
+        run: python -m unittest discover -s tests -p "test_*.py"
 
       - name: Azure login (OIDC)
         uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2.3.1

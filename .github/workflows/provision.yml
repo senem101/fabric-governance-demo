@@ -17,6 +17,10 @@ permissions:
   contents: read
   id-token: write
 
+concurrency:
+  group: fabric-provision
+  cancel-in-progress: false
+
 jobs:
   provision:
     runs-on: ubuntu-latest
@@ -47,4 +51,5 @@ jobs:
         env:
           FABRIC_CAPACITY_ID: ${{ vars.FABRIC_CAPACITY_ID }}
           DRY_RUN: ${{ vars.DRY_RUN || 'false' }}
+          LIVE_CHECKS: ${{ vars.LIVE_CHECKS || 'false' }}
         run: python scripts/provision.py

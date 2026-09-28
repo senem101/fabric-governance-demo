@@ -75,7 +75,7 @@ frontier-fabric-governance-rvas/
 │   ├── drift.py
 │   └── _fabric.py
 └── workspaces/                   # Manifest files PR'd by the agent
-    └── pt-nlyt-sample-ndf-dev-hello1.yaml
+    └── tr-nlyt-sample-ndf-dev-hello1.yaml
 ```
 
 ## End-to-end flow
@@ -195,7 +195,7 @@ CLI run **byte-identical** rule code. To prove it after a change:
 python scripts/validate.py                     # PR-check CLI
 curl -X POST https://$HOST/api/validate \      # M365 agent backend
   -H 'content-type: application/json' \
-  --data @workspaces/pt-nlyt-sample-ndf-dev-hello1.yaml
+  --data @workspaces/tr-nlyt-sample-ndf-dev-hello1.yaml
 ```
 
 The `findings` list must be identical for the same input.

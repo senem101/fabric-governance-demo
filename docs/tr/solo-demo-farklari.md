@@ -58,6 +58,10 @@ kurulumda, gerekli otomatik kontroller geçince kendi PR'ını merge edebilirsin
 | OIDC giriş hatası | `validate` içindeki login hatasıyla devam edilebilir | Yerel workflow'da login hatası işi başarısız yapar | Başarısız kimlik doğrulama başarılı zorunlu kontrol gibi sunulmaz |
 | Drift başlangıcı | İş zamanlanmış veya manuel tetiklendiğinde doğrudan çalışabilir | `DRIFT_ENABLED` yalnız `true` olduğunda job çalışır; başlangıç değeri `false` | Rapor kapsamı gözden geçirilmeden otomatik tenant taraması ve public issue oluşturulması önlenir |
 | Canlı grup sorgusu hataları | Her HTTP hatası “grup yok” sayılır; bazı istisnalar uyarıyla atlanır | HTTP 404 ile diğer hatalar ayrılır; sorgu tamamlanamazsa doğrulama bloklanır, başarıda HTTP 200 kanıtı yazılır | Erişim hatası veya atlanan kontrol başarılı canlı doğrulama gibi sunulmaz |
+| Provisioning ön kontrolü | Script kendi başına schema/policy doğrulamaz; aynı adı bulursa günceller | Bütün manifestler ve owner kimlikleri yazma öncesinde doğrulanır; belirsiz ad veya bu repo işareti olmayan mevcut kaynak engellenir | Otomatik sahiplenme yoktur; görünür liste bütün tenant'ın yokluk kanıtı değildir |
+| Yönetim işareti | Challenge ister, başlangıç scripti yazmaz | Açıklama sonuna `managed-by:gh:<repo>@<sha>` eklenir; drift aynı repo'nun eski commit'ini yanlış fark saymaz | Domain/label/tag uygulanmış olmaz; işaret RBAC yerine geçmez |
+| Uygulama sonucu | Bazı kapasite/rol hataları uyarıyla geçilir; HTTP 202 sonrası beklenmez | Hata başarısız job üretir; kapasite `Completed` ve doğru ID ile, roller ve açıklama geri okumayla doğrulanır | Kısmi yazmalar geri alınmaz; başarısız run sonrası gerçek durum incelenmelidir |
+| Eşzamanlı provisioning | Aynı repo'da paralel run'lar çakışabilir | Provision workflow'u ortak concurrency grubunda seri çalışır | Eski sürüm run'ları ve portal işlemleri bu kilide dahil değildir |
 
 **Production onayı hakkında nüans:** Orijinal Challenge 00 en az bir reviewer
 ister; reviewer'ın mutlaka PR yazarından farklı olacağını açıkça şart koşmaz.
@@ -108,8 +112,8 @@ Bu belgede gerçek tenant, uygulama, grup veya kapasite GUID'leri yayımlanmaz.
 | `DRY_RUN=true` | Açık | Provision scriptinin gerçek değişiklik yapmasını önleyen başlangıç ayarıdır; bütün Azure/Fabric işlemlerini engelleyen bir yetki sınırı değildir |
 | `LIVE_CHECKS=true` | Kişisel repo variable'ı açıldı | Gerçek demo grubu bu çalışma branch'inde hazır; SPN ile başarılı Graph sorgusu yeni PR'da ayrıca doğrulanacak |
 | `DRIFT_ENABLED=false` | Başlangıçta kapalı | Koşulu içeren GitHub workflow'unda zamanlanmış ve manuel drift job'ı atlanır; `true` ancak izinler ve yayımlanacak rapor kapsamı onaylandıktan sonra seçilir |
-| Gerçek manifest sahipleri ve policy kapasitesi | Grup owner hazır; kullanıcı owner ve kapasite örnek değer | Demo grubunun Object ID'sinin public manifestte tutulması açıkça onaylandı; diğer örnek değerler düzeltilmeden gerçek provisioning yapılmamalıdır |
-| `DEFAULT_OWNER_UPN` | Kişisel repoya eklendi; API ile dolu bir değer bulunduğu doğrulandı | Orijinal listede vardır, mevcut scriptler kullanmaz; sırf eklemek sahip ataması sağlamaz |
+| Gerçek manifest sahipleri ve policy kapasitesi | Grup Admin, gerçek kullanıcı Member ve `senem2fabric / westeurope / F64` eşleşmesi iki manifest için hazır | Kapasite ID'si ve onaylı kullanıcı Object ID'si doğrudan dosyalarda; public repoda paylaşılmaları onaylandı. Bu dosyalar gerçek workspace veya erişim ataması yapıldığını göstermez; canlı provisioning ayrıca onay gerektirir |
+| `DEFAULT_OWNER_UPN` | Hesap Entra'da salt okunur sorguyla bulundu; Object ID'si kullanıcı onayıyla manifestlere yazıldı | Mevcut scriptler variable'ı otomatik kullanmaz. UPN dosyaya yazılmadı; variable değişirse manifestteki kimlik kendiliğinden değişmez |
 | `validate` tetikleme kapsamı | İlk PR ile kişisel main'e alındı; tüm PR'ları kapsıyor | Her yeni PR güncel commit için yeniden değerlendirilir |
 | Tam workspace doğrulaması | Yerel workflow `python scripts/validate.py` kullanıyor | Scriptteki `--changed-only` seçeneği kaldırılmadı; yalnız bu CI işinde artık kullanılmıyor |
 | Azure login hata davranışı | `continue-on-error` kaldırıldı; ilk PR'da gerçek OIDC girişi başarılı | Yeni canlı grup kontrolünün Graph erişimi ayrıca kanıtlanmalıdır |

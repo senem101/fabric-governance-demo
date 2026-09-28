@@ -30,7 +30,8 @@
 | Drift | Görülebilen workspace adları ve açıklama | Item tanımı, bağlar, etiket ve izin karşılaştırması |
 
 `rules/policy.yaml` içine `items:` yazmak tek başına yeni kural çalıştırmaz.
-Mevcut provisioner item, domain, sensitivity label, tag veya “managed-by” işareti uygulamaz.
+Mevcut provisioner workspace açıklamasına “managed-by” işareti ekler;
+item, domain, sensitivity label veya tag uygulamaz.
 Asıl challenge'daki rol/tag uygulama maddeleri hedef tasarımdır; bütün item türlerine uyan tek bir API varmış gibi anlatmayın.
 
 ## 3. Dersten önce coach kontrol listesi
@@ -69,29 +70,29 @@ Skill ve MCP araç adlarını kurulu katalogdan kontrol edin; asıl challenge'da
    Test-Path .\scripts\validate_items.py
    Test-Path .\scripts\provision_items.py
    $env:LIVE_CHECKS = 'false'
-   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\pt-nlyt-sample-ndf-dev-hello1.yaml
+   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\tr-nlyt-sample-ndf-dev-hello1.yaml
    $LASTEXITCODE
    ```
 
 6. Mevcut sürümde üç `Test-Path` sonucu `False`; örnek workspace kontrolü `PASS` ve çıkış kodu `0` olmalı.
    `validation-report.md` yerelde üretilir; bu bir dağıtım kaydı değildir. Sanal ortam yoksa ortak kuruluma dönün.
-7. Örnekteki kapasite/grup kimliklerinin sahte olduğunu gösterin. `LIVE_CHECKS=false` gerçek grubun varlığını kanıtlamaz.
+7. Bu kişisel kopyada kapasite, grup ve kullanıcı owner kimlikleri gerçektir. `LIVE_CHECKS=false` gerçek grubun varlığını kanıtlamaz; çevrimdışı PASS bir dağıtım onayı değildir.
    Bu bölümde `provision.py` çalıştırmayın; varsayılanı gerçek değişikliğe izin verir.
 
 ## 5. Güvenli sentetik demo: önce tasarım
 
-1. Tahtaya hedef adı yazın: `pt-nlyt-sales-ndf-dev-lab01`.
-   Altı parça `pt`, `nlyt`, `sales`, `ndf`, `dev`, `lab01`; `environment` alanı da `dev` olmalıdır.
+1. Tahtaya hedef adı yazın: `tr-nlyt-sales-ndf-dev-lab01`.
+   Altı parça `tr`, `nlyt`, `sales`, `ndf`, `dev`, `lab01`; `environment` alanı da `dev` olmalıdır.
 2. Workspace örneğinin **ayrı bir yerel taslağında** `name`, `subject`, `suffix` alanlarını değiştirin.
    Diğer zorunlu alanları silmeyin: özellikle `country`, `area`, `dataProductType`, `domain`, `subDomain`.
    Taslağı canlıya hazır `workspaces/` girdisi saymayın; sahte kimliklerle merge/deploy yapılmaz.
-3. VS Code Explorer'da `challenges/02-items-as-code/starter/items/pt-nlyt-sales-ndf-dev-lab01/` klasörünü oluşturun.
+3. VS Code Explorer'da `challenges/02-items-as-code/starter/items/tr-nlyt-sales-ndf-dev-lab01/` klasörünü oluşturun.
    Bu yol **OLUŞTURULACAK alıştırma çıktısıdır**, mevcut otomasyon tarafından taranmaz.
 4. İçinde `lh_bronze_raw.yaml` adlı yeni dosya açıp aşağıdaki **önerilen sözleşmeyi** kaydedin.
    Bu, Fabric REST gövdesi veya mevcut workspace şemasına uygun dosya değildir.
 
    ```yaml
-   workspace: pt-nlyt-sales-ndf-dev-lab01
+   workspace: tr-nlyt-sales-ndf-dev-lab01
    kind: Lakehouse
    name: lh_bronze_raw
    description: "Yalnizca uydurma satis olaylariyla yapilan egitim icin ham veriyi tutan lakehouse."
@@ -126,7 +127,7 @@ Yalnız yerel taslak üret. scripts/validate.py, scripts/rules_engine.py ve work
 ve sentetik testleri öner. Önce plan ve dosya farkını göster; incelemem olmadan
 değişiklikleri uygulama. Terminal, MCP mutasyonu, oturum açma, dağıtım, notebook
 çalıştırma, commit/push/PR merge yapma. Müşteri tenant'ına bağlanma.
-pt-nlyt-sales-ndf-dev-lab01 adını kullan. Tür bazlı ad, mevcut workspace referansı,
+tr-nlyt-sales-ndf-dev-lab01 adını kullan. Tür bazlı ad, mevcut workspace referansı,
 >=60 karakter açıklama, Group sahip, bağımlılık ve sahte secret negatif testi ekle.
 API tanımlarını resmi belgelerle doğrula; desteklenmeyen özelliği uydurma.
 Yeni şema/scriptten varmış gibi söz etme; test sonucu çalıştırılmadıysa belirt.
@@ -174,7 +175,7 @@ Coach incelemesinde şu sırayı izleyin:
 3. İzinli MCP sunucusunda araç listesini kontrol edip şu doğrulama isteğini kullanın:
 
    ```text
-   Yalnız pt-nlyt-sales-ndf-dev-lab01 adlı, müşteri tarafından onaylı sandbox'ı oku.
+   Yalnız tr-nlyt-sales-ndf-dev-lab01 adlı, müşteri tarafından onaylı sandbox'ı oku.
    Önce workspace kimliğini ve kullandığın hesabın kapsamını bildir. Sadece öğeleri
    listele ve destekleniyorsa lh_bronze_raw, nb_silver_clean, wh_marts_sales
    metadata/tanımlarını oku. getDefinition semantik olarak okuma olsa da POST ve

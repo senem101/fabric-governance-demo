@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import time
 from typing import Any, Optional
+from urllib.parse import urlencode, urlsplit
 
 import requests
 from azure.core.exceptions import AzureError
@@ -38,6 +39,8 @@ def _request(method: str, url: str, *, scope: str = FABRIC_SCOPE,
              expect: tuple[int, ...] = (200, 201, 202, 204),
              retries: int = 5) -> requests.Response:
     headers = {"Authorization": f"Bearer {token(scope)}", "Content-Type": "application/json"}
+    if url.startswith(f"{FABRIC_BASE}/"):
+        headers["x-ms-fabric-skill"] = "onelake-catalog-govern-cli"
     backoff = 2.0
     for attempt in range(retries):
         r = requests.request(method, url, headers=headers, json=json, params=params, timeout=60)
@@ -54,21 +57,50 @@ def _request(method: str, url: str, *, scope: str = FABRIC_SCOPE,
 
 
 # ---------- Workspaces ----------
-def list_workspaces() -> list[dict]:
-    out, url = [], f"{FABRIC_BASE}/workspaces"
+def _list_pages(base_url: str) -> list[dict]:
+    out, url = [], base_url
+    seen = set()
     while url:
-        r = _request("GET", url)
+        if url in seen:
+            raise RuntimeError("Repeated Fabric pagination link; inventory is incomplete")
+        seen.add(url)
+        r = _request("GET", url, expect=(200,))
         body = r.json()
-        out.extend(body.get("value", []))
-        url = body.get("continuationUri")
+        if not isinstance(body, dict) or not isinstance(body.get("value"), list):
+            raise RuntimeError("Invalid Fabric list response; inventory is incomplete")
+        if not all(isinstance(item, dict) for item in body["value"]):
+            raise RuntimeError("Invalid Fabric list entry; inventory is incomplete")
+        out.extend(body["value"])
+        if body.get("continuationToken"):
+            url = f"{base_url}?{urlencode({'continuationToken': body['continuationToken']})}"
+        else:
+            url = body.get("continuationUri")
+            if url:
+                target, base = urlsplit(url), urlsplit(base_url)
+                if (target.scheme, target.netloc, target.path) != (
+                    base.scheme, base.netloc, base.path
+                ):
+                    raise RuntimeError("Unexpected Fabric pagination destination")
     return out
 
 
-def get_workspace_by_name(name: str) -> dict | None:
-    for w in list_workspaces():
-        if w.get("displayName") == name:
-            return w
-    return None
+def list_workspaces() -> list[dict]:
+    return _list_pages(f"{FABRIC_BASE}/workspaces")
+
+
+def get_workspace_by_name(name: str, workspaces: list[dict] | None = None) -> dict | None:
+    workspaces = list_workspaces() if workspaces is None else workspaces
+    matches = [w for w in workspaces if (w.get("displayName") or "").casefold() == name.casefold()]
+    if len(matches) > 1:
+        raise RuntimeError(f"Multiple accessible workspaces match '{name}'; refusing to choose")
+    return matches[0] if matches else None
+
+
+def get_workspace(workspace_id: str) -> dict:
+    body = _request("GET", f"{FABRIC_BASE}/workspaces/{workspace_id}", expect=(200,)).json()
+    if not isinstance(body, dict) or (body.get("id") or "").casefold() != workspace_id.casefold():
+        raise RuntimeError("Workspace readback did not return the requested workspace ID")
+    return body
 
 
 def create_workspace(display_name: str, description: str, capacity_id: str | None = None) -> dict:
@@ -88,19 +120,32 @@ def update_workspace(workspace_id: str, *, description: str | None = None) -> No
     _request("PATCH", f"{FABRIC_BASE}/workspaces/{workspace_id}", json=body)
 
 
-def assign_to_capacity(workspace_id: str, capacity_id: str) -> None:
+def wait_for_capacity(workspace_id: str, capacity_id: str, *,
+                      timeout_seconds: float = 300, poll_seconds: float = 5) -> dict:
+    deadline = time.monotonic() + timeout_seconds
+    while True:
+        workspace = get_workspace(workspace_id)
+        status = workspace.get("capacityAssignmentProgress")
+        if status == "Failed":
+            raise RuntimeError(f"Capacity assignment failed for workspace {workspace_id}")
+        if status not in ("Completed", "InProgress"):
+            raise RuntimeError(f"Unrecognized capacity assignment status: {status!r}")
+        if status == "Completed" and (workspace.get("capacityId") or "").casefold() == capacity_id.casefold():
+            return workspace
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError(f"Timed out verifying capacity assignment for workspace {workspace_id}")
+        time.sleep(min(poll_seconds, remaining))
+
+
+def assign_to_capacity(workspace_id: str, capacity_id: str) -> dict:
     _request("POST", f"{FABRIC_BASE}/workspaces/{workspace_id}/assignToCapacity",
-             json={"capacityId": capacity_id})
+             json={"capacityId": capacity_id}, expect=(202,))
+    return wait_for_capacity(workspace_id, capacity_id)
 
 
 def list_role_assignments(workspace_id: str) -> list[dict]:
-    out, url = [], f"{FABRIC_BASE}/workspaces/{workspace_id}/roleAssignments"
-    while url:
-        r = _request("GET", url)
-        body = r.json()
-        out.extend(body.get("value", []))
-        url = body.get("continuationUri")
-    return out
+    return _list_pages(f"{FABRIC_BASE}/workspaces/{workspace_id}/roleAssignments")
 
 
 def add_role_assignment(workspace_id: str, principal_id: str, principal_type: str, role: str) -> None:
@@ -112,13 +157,7 @@ def add_role_assignment(workspace_id: str, principal_id: str, principal_type: st
 
 # ---------- Capacities ----------
 def list_capacities() -> list[dict]:
-    out, url = [], f"{FABRIC_BASE}/capacities"
-    while url:
-        r = _request("GET", url)
-        body = r.json()
-        out.extend(body.get("value", []))
-        url = body.get("continuationUri")
-    return out
+    return _list_pages(f"{FABRIC_BASE}/capacities")
 
 
 def find_capacity_id_by_display_name(display_name: str) -> str | None:

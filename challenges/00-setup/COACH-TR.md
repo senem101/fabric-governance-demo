@@ -165,9 +165,11 @@ durdurmaz. `DRIFT_ENABLED` de doğrudan çalıştırılan `scripts/drift.py`
 komutunu engellemez; kontrol GitHub job'ındadır. Demo dışı workspace
 isimlerinin public rapora çıkmayacağı doğrulanmadan değeri `true` yapmayın.
 
-`rules\policy.yaml` içindeki `capacityId` şu an örnek `3333...` değeridir.
-**Gerçek GUID ile değiştirin.** Kod policy'deki dolu ID'yi variable'dan önce
-kullanır; yalnız `FABRIC_CAPACITY_ID` eklemek örnek değeri ezmez.
+`rules\policy.yaml` içindeki `capacityId` gerçek kapasite GUID'si olmalıdır.
+Bu kişisel çalışma kopyasında, kullanıcı seçimiyle orijinal doğrudan ID
+yöntemi korunur: `senem2fabric`, `westeurope`, `F64`. Gerçek ID policy'dedir;
+public repo'ya gönderildiğinde görünür olacaktır. Kod policy'deki dolu ID'yi
+variable'dan önce kullanır; yalnız `FABRIC_CAPACITY_ID` eklemek bu değeri ezmez.
 Manifestteki mantıksal kapasite adı ile policy anahtarı birebir eşleşmelidir.
 
 ### 7.1. İlk provadan sonra canlı grup kontrolünü açın
@@ -195,9 +197,13 @@ Bu kopyada demo sahibinin açık onayıyla `sg-fabric-governance-demo` grubunun
 gerçek Object ID'si kullanılır. Grup adı örnek `grp_...` standardına uymadığı
 için isteğe bağlı `groupName` alanı yazılmaz; gerçek ad yorumda belirtilir.
 Şema gevşetilmez, sahte grup adı kullanılmaz; hedef grup `identifier` ile
-belirlenir. Grup yeniden adlandırılmaz veya oluşturulmaz. Kullanıcı owner ve
-policy kapasitesi hâlâ örnek değerlerdir; grup kontrolü bunları doğrulamaz
-ve bu hazırlık gerçek provisioning izni değildir.
+belirlenir. Grup yeniden adlandırılmaz veya oluşturulmaz. Kullanıcı owner,
+`DEFAULT_OWNER_UPN` hesabı salt okunur sorguyla bulunarak Object ID biçiminde
+iki manifeste eklendi; bu ID'nin public dosyalarda tutulması kullanıcı tarafından
+onaylandı. Variable ile otomatik bağlantı kurulmadı; hesap değişirse manifestler
+ayrıca güncellenmelidir. Kapasite eşleşmesi de yerelde gerçek değerlerle hazırdır.
+Grup kontrolü kullanıcı owner'ı veya kapasite atama yetkisini doğrulamaz;
+bu hazırlık gerçek provisioning izni değildir.
 
 ## 8. OIDC: GitHub'ın kısa süreli kimliğine güven tanımlayın
 

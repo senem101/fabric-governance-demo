@@ -71,13 +71,13 @@ Grup sahipliği ve üyelik yönetimi Fabric rol dosyasından ayrı bir müşteri
    Test-Path .\.github\workflows\access-review.yml
    Test-Path .\.github\workflows\access-jit.yml
    $env:LIVE_CHECKS = 'false'
-   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\pt-nlyt-sample-ndf-dev-hello1.yaml
+   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\tr-nlyt-sample-ndf-dev-hello1.yaml
    $LASTEXITCODE
    ```
 
 6. Beklenen: üç `False`, workspace için `PASS` ve çıkış kodu `0`.
    Örnek iki owner içerir ama yalnız biri Admin'dir; doğrulamanın iki Admin zorlamadığını birlikte gözlemleyin.
-   Kimlikler eğitim yer tutucularıdır; yerel `validation-report.md` gerçek Entra varlığını doğrulamaz.
+   Bu kişisel kopyada kullanıcı ve grup kimlikleri gerçektir. Çevrimdışı `validation-report.md` gerçek Entra varlığını doğrulamaz.
 
 ## 5. Güvenli negatif test: mevcut boşluğu ispatlayın
 
@@ -92,8 +92,8 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path("scripts").resolve()))
 from rules_engine import load_yaml, validate_manifest
-base = load_yaml(Path("workspaces") / "pt-nlyt-sample-ndf-dev-hello1.yaml")
-base.update(name="pt-nlyt-sales-ndf-dev-lab01", subject="sales", suffix="lab01")
+base = load_yaml(Path("workspaces") / "tr-nlyt-sample-ndf-dev-hello1.yaml")
+base.update(name="tr-nlyt-sales-ndf-dev-lab01", subject="sales", suffix="lab01")
 result = validate_manifest(base)
 print("iki-owner-tek-admin", result.passed)
 assert result.passed
@@ -103,7 +103,7 @@ result = validate_manifest(expiry)
 print("owners-icinde-expiry", [f.rule_id for f in result.blocking])
 assert any(f.rule_id == "schema" for f in result.blocking)
 prod = copy.deepcopy(base)
-prod.update(name="pt-nlyt-sales-ndf-prd-lab01", environment="prd", sensitivityLabel="Confidential")
+prod.update(name="tr-nlyt-sales-ndf-prd-lab01", environment="prd", sensitivityLabel="Confidential")
 prod["owners"] = [
     {"principalType": "Group", "identifier": "44444444-4444-4444-4444-444444444444", "role": "Admin"},
     {"principalType": "Group", "identifier": "55555555-5555-5555-5555-555555555555", "role": "Member"},
@@ -121,13 +121,13 @@ Katılımcıdan “neden tarihi mevcut owners'a eklemek yeterli değil?” sorus
 
 ## 6. Erişim dosyasını tasarlayın — henüz çalışan entegrasyon değil
 
-1. VS Code Explorer'da `access/` klasörünü ve `pt-nlyt-sales-ndf-dev-lab01.yaml` dosyasını oluşturun.
+1. VS Code Explorer'da `access/` klasörünü ve `tr-nlyt-sales-ndf-dev-lab01.yaml` dosyasını oluşturun.
    Bu yol **OLUŞTURULACAK alıştırma çıktısıdır**; bugünkü script'ler bu dizini okumaz.
 2. Aşağıdaki önerilen sözleşmeyi yazın. Bütün ID'ler sahtedir; hiçbirini canlı istekte kullanmayın.
    Tarihler sabit saatli test içindir; canlı erişim talebi veya bugün geçerli süre anlamına gelmez.
 
    ```yaml
-   workspace: pt-nlyt-sales-ndf-dev-lab01
+   workspace: tr-nlyt-sales-ndf-dev-lab01
    allowRemovals: false
    bindings:
      - principalType: Group
@@ -214,7 +214,7 @@ removal planlama. İzin iptalini yalnız PR açılmış olmasına dayanarak baş
 3. MCP katalog/bağlantısı varsa şu salt okunur doğrulama isteğini verin:
 
    ```text
-   Sadece müşteri onaylı pt-nlyt-sales-ndf-dev-lab01 sandbox'ının rol atamalarını oku.
+   Sadece müşteri onaylı tr-nlyt-sales-ndf-dev-lab01 sandbox'ının rol atamalarını oku.
    Önce workspace kimliğini ve sorgu hesabını doğrula. Bütün sayfaları okuyup
    Group/User/ServicePrincipal ve role göre sayıları göster; kişisel isimleri maskele.
    Erişim ekleme/değiştirme/silme, grup üyeliği düzenleme veya yetki yükseltme yapma.
