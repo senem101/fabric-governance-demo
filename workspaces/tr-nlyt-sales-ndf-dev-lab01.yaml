@@ -12,7 +12,7 @@ description: "Training workspace for sales analytics using synthetic data only."
 capacity: senem2fabric
 region: westeurope
 sensitivityLabel: General
-costCenter: CC-1001
+costCenter: CC-0000
 owners:
   - principalType: Group
     identifier: f647243f-dfb1-47f2-a372-1d11ccbf037a   # sg-fabric-governance-demo
