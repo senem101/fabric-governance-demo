@@ -31,9 +31,9 @@ Item/access/domain/medallion/agent/audit/promotion sözleşmeleri ve uygulayıc�
 workspace'in ayrı `country`, `area`, `subject`, `dataProductType`, `environment`,
 `suffix` alanları isimle eşleşmelidir.
 
-Mevcut provisioner açıklama/kapasite ve eksik rol eklemeyi kapsar.
-Domain, label, tag ve `managed-by` marker uygulaması; rol kaldırma, süre bitimi
-ve silme hazır değildir. Bazı kapasite/rol hataları sadece warning üretir.
+Mevcut provisioner açıklama/kapasite, `managed-by` marker ve eksik rol eklemeyi kapsar.
+Domain, label, tag uygulaması; rol kaldırma, süre bitimi ve silme hazır değildir.
+Kapasite/rol hataları job'ı başarısız yapar; kısmi yazmalar otomatik geri alınmaz.
 Mevcut drift ad/varlık/açıklama kıyaslar; label, erişim, agent veya item drift'i değildir.
 Görülebilen workspace listesi de tüm tenant envanteriyle aynı olmayabilir.
 
@@ -178,8 +178,8 @@ Offline fixture, ekran provası ve canlı servis sonucu ayrı sütunlarda tutulm
 | [07](../07-audit-observability/COACH-TR.md) | PR/run/SHA korelasyonu, Eventhouse olayı, rapor metriği, test bildirimi | Duplicate çift sayılmaz; eksik feed “0” değil “unknown” |
 | [08](../08-deployment-pipelines/COACH-TR.md) | Release SHA, gate, LRO success, hedef item/readback ve tanım rollback'i | Onaysız/eskimiş source deploy engeli; 202 tek başına başarı değil |
 
-`managed-by` marker özgün rubric'te geçer ama mevcut provisioner bunu yazmaz.
-Geliştirilmediyse “yok” yazın; isterseniz ayrı uzantı ve testle ekleyin.
+Workspace açıklamasındaki `managed-by` marker'ı gerçek dağıtımın repo/SHA
+değerleriyle doğrulayın; item/agent gibi diğer kaynaklarda aynı uygulama hazır değildir.
 Benzer şekilde “drift=0” cümlesinin yanına **hangi alanlar ve hangi görünür kaynaklar**
 kontrol edildiğini mutlaka yazın; genel uyumluluk sertifikası gibi sunmayın.
 

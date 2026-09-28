@@ -21,8 +21,8 @@ workspace'i arasındaki ilişkiyi öğretmek.
 
 | Hazır | Hazır değil / sınır |
 |---|---|
-| Workspace JSON schema ve policy doğrulama | Provisioner kendi başına doğrulama çağırmaz |
-| Workspace açma; açıklama ve kapasiteyi güncelleme | Otomatik `managed-by` işareti, domain/label/tag uygulama |
+| Workspace JSON schema ve policy doğrulama; bütün manifestler için yazma öncesi kontrol | Kontroller ve API erişimi, tenant genelinde isim yokluğu kanıtı değildir |
+| Workspace açma; açıklama, `managed-by` işareti ve kapasiteyi güncelleme; sonucu geri okuma | Domain/label/tag uygulama ve otomatik rollback |
 | Eksik owner rolünü ekleme | Fazla rolü kaldırma, mevcut rolü dönüştürme, expiry |
 | Görünür workspace adları/açıklamalarını karşılaştırma | Tüm tenant, roller, kapasite ve hassasiyet drift'i |
 | Drift raporu ve workflow ile issue açma | Otomatik düzeltme veya issue kapatma |
@@ -37,12 +37,15 @@ kullanmayın. Aşağıdaki altı parçalı yapı mevcut şemaya uygundur.
 2. Repo kökünü VS Code'da açın. Aktif branch'inizi ve `origin` adresini
    [ilk kurulumdaki](../../docs/tr/ilk-kurulum.md) şekilde kontrol edin.
 3. Canlı demo için gerçek kapasite ID'sinin **policy içinde** güncellendiğini
-   ve iki onaylı grup Object ID'sinin hazır olduğunu doğrulayın.
+   ve en az iki owner kimliğinin hazır olduğunu doğrulayın. Dev örneğimiz
+   bir Group Admin ve bir User Member kullanır; iki Group şartı `prd` içindir.
 4. Provisioner tüm `workspaces\*.yaml` dosyalarını işler. Depodaki
    `tr-nlyt-sample-ndf-dev-hello1.yaml` örneğini de gerçek değerlere uyarlayın
    veya müşteri lab'ı hazırlık PR'ında kaldırın. Sahte owner'larla bırakmayın.
-5. Var olan müşteri workspace'iyle aynı adı seçmeyin; kod adı eşleşen kaynağı
-   güncelleyebilir. Eğitim ekibine özel bir suffix belirleyin.
+5. Var olan müşteri workspace'iyle aynı adı seçmeyin. Kod, aynı ad birden çok
+   görünür kaynakta varsa veya mevcut kaynak bu repo'nun `managed-by` işaretini
+   taşımıyorsa durur; otomatik sahiplenme yapmaz. İşaret yetkilendirme sınırı
+   değildir; gerçek erişim kontrolü Fabric RBAC ve GitHub onaylarıdır.
 
 ## 4. Dosyaları önce birlikte okuyun
 
@@ -176,13 +179,29 @@ demesi teknik kontrolün yerine geçmez.
 
 1. Bütün manifestler, kapasite ve grup ID'leri gerçek; tam validation PASS;
    branch/environment korumaları hazır olmalı.
+   Eski `production` onayı bekleyen çalıştırmaları inceleyin; yeni canlı
+   ayarla yanlış sürümü çalıştırmamak için yetkili kişi eski run'ı iptal etmelidir.
 2. Müşteri yöneticisi GitHub variable `DRY_RUN` değerini `false` yapar.
    Bu, provisioner'ı gerçek yazma moduna geçirir.
 3. **Actions > provision > Run workflow**, branch **main** seçilir.
 4. Environment onayı yine alınır; loglarda oluşturma/güncelleme ve rol
    ekleme sonucunu inceleyin.
-5. `warn:`, `skipping` ve `role assignment failed` satırları varsa workspace
-   oluşsa bile demo tamamlanmış sayılmaz. Yetkili kişi sebebi düzeltir.
+5. Kapasite atamasında HTTP 202 yalnız kabul anlamına gelir. Script,
+   `GET /workspaces/{id}` yanıtında hedef `capacityId` ve
+   `capacityAssignmentProgress=Completed` birlikte görülene kadar en fazla
+   300 saniye bekler. `Failed`, bilinmeyen durum ve zaman aşımı hata üretir.
+6. İstenen roller en fazla 60 saniye tekrar okunarak doğrulanır; açıklama ve
+   workspace adı da kontrol edilir. Kapasite/rol hatası veya çözülemeyen User
+   UPN artık atlanmaz, job başarısız olur. Önceki başarılı API yazmaları otomatik
+   geri alınmaz; logdaki workspace ID'sini inceleyip sebebi düzeltin.
+
+Canlı çalıştırmada `GITHUB_REPOSITORY` ve tam `GITHUB_SHA` zorunludur; Actions
+bunları otomatik sağlar. Açıklamanın sonuna `managed-by:gh:<repo>@<sha>`
+eklenir; açıklama ve işaret toplamı Fabric'in 4000 karakter sınırını aşamaz.
+Yerel dry-run'da bu iki değer yoksa işaret önizlemesinin eksik olduğu açıkça
+yazılır. Provision workflow'u `LIVE_CHECKS` ayarını da kullanır; `true` ise
+yazma öncesi Entra grup kontrolü yeniden yapılır. Provision run'ları aynı
+concurrency grubunda seri çalışır; bu, bağımsız portal değişikliklerini kilitlemez.
 
 Provisioner için “idempotent” ifadesini **aynı adla yeniden çalıştırınca
 ikinci workspace açmama** kapsamında anlatın; rol kaldırma/değiştirme gibi
@@ -207,16 +226,22 @@ Kaynak veya rol oluşturma, değiştirme ya da silme.
 alanlarıyla uyumlu. Otomasyonu oluşturan SPN gibi ek roller bulunabilir;
 mevcut kod bunları temizlemez.
 
-`managed-by:gh:...` işareti beklemeyin; otomatik yazılmaz. `tags.managedBy`
-eklemek de bu davranışı oluşturmaz.
+Workspace açıklamasının sonunda `managed-by:gh:<repo>@<dağıtım-commit-SHA>`
+işaretini arayın. `tags.managedBy` ayrı manifest metadata'sıdır ve Fabric tag
+olarak uygulanmaz. Marker'ın varlığı tek başına bütün ayarların doğru olduğunu
+kanıtlamaz; kapasite ve roller ayrıca doğrulanır.
 
 ## 10. Drift demosu: açıklamayı değiştirin
 
-1. Önce **Actions > drift > Run workflow > main** ile başlangıç taraması alın.
+1. `DRIFT_ENABLED=false` iken job çalışmaz. Raporun public kapsamı ayrıca
+   incelenip onaylanmadan bu ayarı açmayın. Onaylı kapsam hazırsa
+   **Actions > drift > Run workflow > main** ile başlangıç taraması alın.
    SPN başka workspace'ler de görüyorsa raporda “unmanaged” çıkabilir.
    Bunları demo adına silmeyin; taramanın kapsam sınırını anlatın.
-2. Müşteri onayıyla yalnız eğitim workspace'inin açıklamasını portalda
-   geçici bir metne değiştirin. Erişim rolü kaldırmayın: mevcut drift kodu bunu yakalamaz.
+2. Müşteri onayıyla yalnız eğitim workspace'inin açıklama gövdesini portalda
+   geçici bir metne değiştirin; sondaki `managed-by` satırı ve önündeki boş satır
+   kalsın. İşaret silinirse güvenli provisioner otomatik sahiplenmeyi reddeder.
+   Erişim rolü kaldırmayın: mevcut drift kodu bunu yakalamaz.
 3. `drift` workflow'unu tekrar çalıştırın.
 4. **Beklenen:** Hedef workspace `description mismatch` kapsamında görünür;
    script exit code `2` üretebilir, workflow `drift, governance` issue'su açar.
@@ -229,6 +254,10 @@ eklemek de bu davranışı oluşturmaz.
 
 Drift teknik hatayla da sıfır olmayan kod döndürebilir; her açılan issue'yu
 “kanıtlanmış yapılandırma farkı” saymadan önce log ve raporu okuyun.
+Karşılaştırma detay API'sinden okunan açıklamayı kullanır. Aynı repo'nun geçerli
+işaretindeki commit'in daha eski olması tek başına drift değildir; açıklama
+değişikliği, eksik/bozuk işaret veya başka repo işareti drift sayılır.
+Yerel drift çağrısında da `GITHUB_REPOSITORY` doğru repo'yu belirtmelidir.
 
 ## 11. Başarı kanıtı ve öğrenci uygulaması
 
@@ -251,8 +280,9 @@ doğrulama tamam; canlı provision ve drift denenmedi”** yazın.
 | Schema isim hatası | Altı parçayı ve `name`/alan eşleşmesini kontrol edin |
 | Capacity not approved | Mantıksal adı policy anahtarıyla eşleştirin |
 | Yanlış bölge | Manifest `region` ve policy kapasite bölgesini eşleştirin |
-| Owner rolü oluşmadı | Log uyarısı, Object ID, SPN workspace yetkisi; green job'a güvenmeyin |
-| UPN atlandı | Yerel kullanıcı adı değil Entra Object ID kullanın; Graph erişimi ayrıca gerekir |
+| Owner rolü oluşmadı | Job hata verir; Object ID ve SPN workspace yetkisini kontrol edin, kısmi yazmaları inceleyin |
+| UPN çözülemedi | Yazma öncesi işlem durur; doğrulanmış Entra Object ID kullanın veya gerekli Graph erişimini onaylatın |
+| Management marker yok | Mevcut kaynağı otomatik sahiplenmeyin; ID ve kaynağın gerçek sahibini doğrulayın. Drift demosunda marker'ı koruyun |
 | PR kontrolü hiç çalışmadı | `.yaml` dosyasının `workspaces` altında olduğunu ve path filtresini kontrol edin |
 | Policy değişti ama dosyalar sınanmadı | Çalışan workflow sürümünü kontrol edin; bu kopyanın CI işi tüm workspace manifestlerini doğrular, eski `--changed-only` çağrısı aynı kapsamı sağlamaz |
 | Workspace var ama ben göremiyorum | Kendi Entra hesabınız/tenant'ınız ve grup üyeliğiniz |

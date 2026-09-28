@@ -58,6 +58,10 @@ kurulumda, gerekli otomatik kontroller geçince kendi PR'ını merge edebilirsin
 | OIDC giriş hatası | `validate` içindeki login hatasıyla devam edilebilir | Yerel workflow'da login hatası işi başarısız yapar | Başarısız kimlik doğrulama başarılı zorunlu kontrol gibi sunulmaz |
 | Drift başlangıcı | İş zamanlanmış veya manuel tetiklendiğinde doğrudan çalışabilir | `DRIFT_ENABLED` yalnız `true` olduğunda job çalışır; başlangıç değeri `false` | Rapor kapsamı gözden geçirilmeden otomatik tenant taraması ve public issue oluşturulması önlenir |
 | Canlı grup sorgusu hataları | Her HTTP hatası “grup yok” sayılır; bazı istisnalar uyarıyla atlanır | HTTP 404 ile diğer hatalar ayrılır; sorgu tamamlanamazsa doğrulama bloklanır, başarıda HTTP 200 kanıtı yazılır | Erişim hatası veya atlanan kontrol başarılı canlı doğrulama gibi sunulmaz |
+| Provisioning ön kontrolü | Script kendi başına schema/policy doğrulamaz; aynı adı bulursa günceller | Bütün manifestler ve owner kimlikleri yazma öncesinde doğrulanır; belirsiz ad veya bu repo işareti olmayan mevcut kaynak engellenir | Otomatik sahiplenme yoktur; görünür liste bütün tenant'ın yokluk kanıtı değildir |
+| Yönetim işareti | Challenge ister, başlangıç scripti yazmaz | Açıklama sonuna `managed-by:gh:<repo>@<sha>` eklenir; drift aynı repo'nun eski commit'ini yanlış fark saymaz | Domain/label/tag uygulanmış olmaz; işaret RBAC yerine geçmez |
+| Uygulama sonucu | Bazı kapasite/rol hataları uyarıyla geçilir; HTTP 202 sonrası beklenmez | Hata başarısız job üretir; kapasite `Completed` ve doğru ID ile, roller ve açıklama geri okumayla doğrulanır | Kısmi yazmalar geri alınmaz; başarısız run sonrası gerçek durum incelenmelidir |
+| Eşzamanlı provisioning | Aynı repo'da paralel run'lar çakışabilir | Provision workflow'u ortak concurrency grubunda seri çalışır | Eski sürüm run'ları ve portal işlemleri bu kilide dahil değildir |
 
 **Production onayı hakkında nüans:** Orijinal Challenge 00 en az bir reviewer
 ister; reviewer'ın mutlaka PR yazarından farklı olacağını açıkça şart koşmaz.

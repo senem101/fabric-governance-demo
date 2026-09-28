@@ -30,7 +30,8 @@
 | Drift | Görülebilen workspace adları ve açıklama | Item tanımı, bağlar, etiket ve izin karşılaştırması |
 
 `rules/policy.yaml` içine `items:` yazmak tek başına yeni kural çalıştırmaz.
-Mevcut provisioner item, domain, sensitivity label, tag veya “managed-by” işareti uygulamaz.
+Mevcut provisioner workspace açıklamasına “managed-by” işareti ekler;
+item, domain, sensitivity label veya tag uygulamaz.
 Asıl challenge'daki rol/tag uygulama maddeleri hedef tasarımdır; bütün item türlerine uyan tek bir API varmış gibi anlatmayın.
 
 ## 3. Dersten önce coach kontrol listesi

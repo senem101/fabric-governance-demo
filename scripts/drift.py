@@ -18,6 +18,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _fabric as fab  # noqa: E402
+from workspace_metadata import description_matches  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 WORKSPACES_DIR = REPO_ROOT / "workspaces"
@@ -35,8 +36,10 @@ def main() -> int:
     unmanaged = sorted(set(tenant) - set(manifests))
     missing = sorted(set(manifests) - set(tenant))
     drift = []
+    repository = os.environ.get("GITHUB_REPOSITORY", "")
     for name in sorted(set(manifests) & set(tenant)):
-        if (tenant[name].get("description") or "") != manifests[name]["description"]:
+        actual = fab.get_workspace(tenant[name]["id"])
+        if not description_matches(actual.get("description") or "", manifests[name]["description"], repository):
             drift.append(name)
 
     lines = ["# Fabric Workspace Drift Report", ""]

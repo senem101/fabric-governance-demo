@@ -30,7 +30,8 @@ Bir etiket adı da tek başına her dışa aktarımı engellediği anlamına gel
 | Şema | Yalnız workspace şeması | Domain ve kapasite şemaları |
 
 `domains/`, `capacities/`, ilgili şemalar ve uygulama adımları **OLUŞTURULACAK alıştırma çıktılarıdır**.
-Mevcut provisioner `tags`/managed-by işareti de uygulamaz; yeşil job tüm metadata'nın eşleştiğini kanıtlamaz.
+Mevcut provisioner açıklamaya managed-by işareti ekler ve kapasite sonucunu
+geri okur; `tags` uygulamaz. Yeşil job tüm metadata'nın eşleştiğini kanıtlamaz.
 `drift.yml` yalnız mevcut rapor için `drift, governance` etiketleriyle issue açar; `drift/configuration` ve otomatik kapanış yoktur.
 
 ## 3. Kurulum, roller ve lisanslar
