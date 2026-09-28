@@ -1,6 +1,6 @@
 # Solo demo ile orijinal tasarım arasındaki farklar
 
-**Karar ve durum tarihi:** 27 Eylül 2026.
+**Karar ve durum tarihi:** 28 Eylül 2026.
 **Karşılaştırma temeli:** Orijinal `913bbf7` sürümündeki Challenge 00,
 kimlik dokümanı ve üç GitHub Actions workflow'u.
 
@@ -57,6 +57,7 @@ kurulumda, gerekli otomatik kontroller geçince kendi PR'ını merge edebilirsin
 | PR kontrolünün kapsamı | Path filtreleriyle tetiklenir; yalnız değişen workspace manifestlerini denetler | Yerel workflow tüm PR'larda bütün workspace manifestlerini denetleyecek şekilde hazırlandı | Doküman PR'ları zorunlu check beklerken takılmaz; policy/schema değişikliği tüm workspace'ler için değerlendirilir |
 | OIDC giriş hatası | `validate` içindeki login hatasıyla devam edilebilir | Yerel workflow'da login hatası işi başarısız yapar | Başarısız kimlik doğrulama başarılı zorunlu kontrol gibi sunulmaz |
 | Drift başlangıcı | İş zamanlanmış veya manuel tetiklendiğinde doğrudan çalışabilir | `DRIFT_ENABLED` yalnız `true` olduğunda job çalışır; başlangıç değeri `false` | Rapor kapsamı gözden geçirilmeden otomatik tenant taraması ve public issue oluşturulması önlenir |
+| Canlı grup sorgusu hataları | Her HTTP hatası “grup yok” sayılır; bazı istisnalar uyarıyla atlanır | HTTP 404 ile diğer hatalar ayrılır; sorgu tamamlanamazsa doğrulama bloklanır, başarıda HTTP 200 kanıtı yazılır | Erişim hatası veya atlanan kontrol başarılı canlı doğrulama gibi sunulmaz |
 
 **Production onayı hakkında nüans:** Orijinal Challenge 00 en az bir reviewer
 ister; reviewer'ın mutlaka PR yazarından farklı olacağını açıkça şart koşmaz.
@@ -105,13 +106,13 @@ Bu belgede gerçek tenant, uygulama, grup veya kapasite GUID'leri yayımlanmaz.
 | Konu | Şimdiki durum | Nasıl yorumlanmalı? |
 |---|---|---|
 | `DRY_RUN=true` | Açık | Provision scriptinin gerçek değişiklik yapmasını önleyen başlangıç ayarıdır; bütün Azure/Fabric işlemlerini engelleyen bir yetki sınırı değildir |
-| `LIVE_CHECKS=false` | Kapalı | Entra gruplarının canlı varlık kontrolü henüz açılmadı; OIDC girişini veya SPN'nin yetkilerini kapatmaz |
+| `LIVE_CHECKS=true` | Kişisel repo variable'ı açıldı | Gerçek demo grubu bu çalışma branch'inde hazır; SPN ile başarılı Graph sorgusu yeni PR'da ayrıca doğrulanacak |
 | `DRIFT_ENABLED=false` | Başlangıçta kapalı | Koşulu içeren GitHub workflow'unda zamanlanmış ve manuel drift job'ı atlanır; `true` ancak izinler ve yayımlanacak rapor kapsamı onaylandıktan sonra seçilir |
-| Gerçek manifest sahipleri ve policy kapasitesi | Hazırlık bekliyor | Örnek kimlikler canlıya uygun hale getirilmeden gerçek provisioning yapılmamalıdır |
+| Gerçek manifest sahipleri ve policy kapasitesi | Grup owner hazır; kullanıcı owner ve kapasite örnek değer | Demo grubunun Object ID'sinin public manifestte tutulması açıkça onaylandı; diğer örnek değerler düzeltilmeden gerçek provisioning yapılmamalıdır |
 | `DEFAULT_OWNER_UPN` | Kişisel repoya eklendi; API ile dolu bir değer bulunduğu doğrulandı | Orijinal listede vardır, mevcut scriptler kullanmaz; sırf eklemek sahip ataması sağlamaz |
-| `validate` tetikleme kapsamı | Bu çalışma branch'indeki dosyada tüm PR'ları kapsıyor | Branch'teki dosya main'i otomatik güncellemez; gerçek PR çalıştırması ve merge ayrı adımlardır |
+| `validate` tetikleme kapsamı | İlk PR ile kişisel main'e alındı; tüm PR'ları kapsıyor | Her yeni PR güncel commit için yeniden değerlendirilir |
 | Tam workspace doğrulaması | Yerel workflow `python scripts/validate.py` kullanıyor | Scriptteki `--changed-only` seçeneği kaldırılmadı; yalnız bu CI işinde artık kullanılmıyor |
-| Azure login hata davranışı | Yerel `validate` adımından `continue-on-error` kaldırıldı | Gerçek OIDC denemesi yine gereklidir; dosyanın hazırlanması başarılı token exchange kanıtı değildir |
+| Azure login hata davranışı | `continue-on-error` kaldırıldı; ilk PR'da gerçek OIDC girişi başarılı | Yeni canlı grup kontrolünün Graph erişimi ayrıca kanıtlanmalıdır |
 
 Bu satırlar, “solo demoda canlı doğrulama yapılmaz” veya “Actions
 çalıştırılamaz” şeklinde yorumlanmamalıdır.
@@ -135,13 +136,16 @@ kontrol edilmelidir.
 | SPN, güvenlik grubu ve Fabric yönetici hazırlığı | Kullanıcı tarafından kurulduğu bildirildi; doğru kapasitenin yönetici listesinde SPN'nin bulunduğu kullanıcı tarafında CLI ile kontrol edildi |
 | Üç federated credential | Kullanıcı tarafından oluşturuldu; kaydedilmiş issuer, audience ve subject değerleri CLI çıktısında karşılaştırıldı |
 | Production environment | Reviewer, kendi dağıtımını onaylayabilme, main branch sınırı ve admin bypass kapalı ayarları daha önce GitHub API ile kontrol edildi |
-| Hosted runner uyarlaması | Üç workflow ve ilgili rehberler bu çalışma branch'inde hazır; main'e alınması ve gerçek GitHub çalıştırması bekliyor |
+| Hosted runner uyarlaması | İlk kişisel PR main'e merge edildi; PR doğrulaması GitHub-hosted runner'da başarılı çalıştı |
 | Solo branch protection | GitHub'da uygulandı: PR zorunlu, onay sayısı 0, CODEOWNERS onayı kapalı, `validate` kaynağı GitHub Actions, branch güncel olmalı, kurallar admin'e de uygulanır, force push/silme kapalı |
-| Solo CODEOWNERS | Bu çalışma branch'inde repo sahibine göre düzenlendi ve üretim dosya deseni düzeltildi; merge yapılmadığı için remote main'de örnek kayıtlar duruyor |
+| Solo CODEOWNERS | İlk kişisel PR ile main'e alındı; sahip repo kullanıcısı, üretim dosya deseni düzeltildi |
 | GitHub Actions / OIDC çalıştırması | İlk kişisel PR çalışmasında `Azure login (OIDC)` ve `Validate` başarılı oldu. Yeni commit'ler için güncel kontrol sonucu ayrıca beklenir |
-| Drift başlangıç kontrolü | Bu çalışma branch'inde job düzeyinde opt-in koşulu var; main'e merge edilmeden main'deki eski workflow korunmuş sayılmaz |
+| Drift başlangıç kontrolü | İlk kişisel PR ile main'e alındı; `DRIFT_ENABLED=false` |
+| Microsoft Graph grup izni | `Group.ReadBasic.All` Application için yönetici onayı verildi; gerçek SPN app-role ataması salt okunur CLI sorgusuyla doğrulandı |
+| Canlı grup girdisi | Gerçek demo grup ID'si bu çalışma branch'inde hazır. Yeni PR'da SPN ile HTTP 200 sonucu henüz bekleniyor; insan hesabının grup sorgusu bu kanıtın yerine geçmez |
 | MCP smoke kontrolleri | Kullanıcı dört gerçek araç çağrısını doğruladı: workspace ve kapasite listeleri, en az 6 iş yükü türü ve Lakehouse OpenAPI içeriği |
-| Tam Challenge 00 kabulü | Tamamlanmadı; canlı grup kontrolü hazırlığı, main'e merge ve onaylı dry-run provası bekliyor. Başarılı PR OIDC girişi tek başına Fabric API yazma yetkisini kanıtlamaz |
+| Tam Challenge 00 kabulü | Canlı grup doğrulaması ve 60 saniyelik kimlik akışı özeti bekliyor. Bağlı setup rehberindeki gerçek workspace oluşturma provası ayrıca tamamlanmalı; dry-run bunu kanıtlamaz |
+| GitHub Pages | Pages kurulmadığı için ayrı yayın işi hata verdi; kullanıcı bu hatayı olduğu gibi bırakmayı seçti. Challenge 00'ın şartı değildir |
 
 **Yerel dosya değişikliği GitHub ayarı değildir.** GitHub branch koruması,
 CODEOWNERS dosyasının doğru branch'e ulaşması ve Actions'ın gerçek

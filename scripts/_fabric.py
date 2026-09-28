@@ -11,6 +11,7 @@ import time
 from typing import Any, Optional
 
 import requests
+from azure.core.exceptions import AzureError
 from azure.identity import DefaultAzureCredential
 
 FABRIC_BASE = "https://api.fabric.microsoft.com/v1"
@@ -128,11 +129,33 @@ def find_capacity_id_by_display_name(display_name: str) -> str | None:
 
 
 # ---------- Graph (group existence) ----------
+class GraphGroupLookupError(RuntimeError):
+    """The group lookup could not be completed reliably."""
+
+
 def graph_group_exists(object_id: str) -> bool:
-    headers = {"Authorization": f"Bearer {token(GRAPH_SCOPE)}"}
-    r = requests.get(f"https://graph.microsoft.com/v1.0/groups/{object_id}",
-                     headers=headers, timeout=30)
-    return r.status_code == 200
+    try:
+        headers = {"Authorization": f"Bearer {token(GRAPH_SCOPE)}"}
+        r = requests.get(f"https://graph.microsoft.com/v1.0/groups/{object_id}",
+                         headers=headers, params={"$select": "id"}, timeout=30)
+    except AzureError as e:
+        raise GraphGroupLookupError("could not authenticate to Microsoft Graph") from e
+    except requests.RequestException as e:
+        raise GraphGroupLookupError("Microsoft Graph group request failed") from e
+    if r.status_code == 404:
+        return False
+    if r.status_code != 200:
+        raise GraphGroupLookupError(
+            f"Microsoft Graph group lookup returned HTTP {r.status_code}"
+        )
+    try:
+        body = r.json()
+    except ValueError as e:
+        raise GraphGroupLookupError("Microsoft Graph returned invalid JSON") from e
+    group_id = body.get("id") if isinstance(body, dict) else None
+    if not isinstance(group_id, str) or group_id.lower() != object_id.lower():
+        raise GraphGroupLookupError("Microsoft Graph did not return the requested group ID")
+    return True
 
 
 def graph_resolve_upn(upn: str) -> str | None:

@@ -140,6 +140,32 @@ Pattern: grp_<service>_<environment>_<profile>
 
 ## 5. Design Notes
 
+### Live owner-group validation
+
+With `LIVE_CHECKS=true`, the shared rule engine checks each Group owner's
+`identifier` using Microsoft Graph `GET /groups/{id}?$select=id`. Configure
+an appropriate application permission, such as `Group.ReadBasic.All`, with
+admin consent on the GitHub OIDC service principal. This permission reads basic
+properties of all tenant groups; it is not limited to the demo group.
+
+- HTTP 200 with the requested group ID produces an `owner-groups-exist` info finding.
+- HTTP 404 is a blocking group-not-found finding.
+- Authentication, permission, network, service, and malformed-response errors
+  block validation rather than being skipped or reported as a missing group.
+- With `LIVE_CHECKS` absent or `false`, no group lookup is made.
+
+This verifies group existence only, not membership, the human owner, capacity,
+or effective Fabric permissions. The manifest's `groupName` is optional
+and is not compared with the directory display name. If supplied, it must
+match the schema's naming pattern. For an existing group with a different
+name, omit this optional field instead of supplying a fictitious name or
+weakening the schema; the Object ID still identifies the group.
+
+Run the offline regression tests from the repository root:
+`python -m unittest discover -s tests -p test_live_group_validation.py`.
+
+### Model considerations
+
 - **Domain vs. sub-domain:** domains are the coarse-grained business capability;
   sub-domains partition a domain (by environment for IT, by business unit for BU).
 - **Medallion layers:** `dataproducttype` (`brz`/`slv`/`gld`/`ndf`) captures the

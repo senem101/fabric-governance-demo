@@ -14,9 +14,8 @@ sensitivityLabel: General
 costCenter: CC-1001
 owners:
   - principalType: Group
-    identifier: 44444444-4444-4444-4444-444444444444   # sg-fabric-workspace-provisioner (replace with your group's Object ID)
+    identifier: f647243f-dfb1-47f2-a372-1d11ccbf037a   # sg-fabric-governance-demo
     role: Admin
-    groupName: grp_fabric_dev_nlyt_admin
   - principalType: User
     identifier: workspace-owner@contoso.com   # UPN or Object ID of a workspace owner
     role: Member

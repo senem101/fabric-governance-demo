@@ -126,12 +126,23 @@ The workflows already do this; if you're running locally, repeat the steps.
 
 ### `validate.py` reports a Python-side rule error you can't reproduce
 
-Cause: live-tenant checks rely on an Azure login. The CI workflow runs
-`azure/login@v2` with `continue-on-error: true` so that local runs don't fail
-without credentials.
+Cause: live group checks require an Azure login and Microsoft Graph read
+permission. The CI workflow requires a successful `azure/login` step.
+With `LIVE_CHECKS=true`, a failed lookup blocks validation; it is not skipped.
 
 Fix: set `LIVE_CHECKS=false` for offline development:
 
 ```bash
 LIVE_CHECKS=false python scripts/validate.py
 ```
+
+For live CI validation, keep `LIVE_CHECKS=true` and fix the actual cause:
+
+- HTTP 404: check the Group owner's Object ID and the login tenant.
+- HTTP 401/403: check SPN authentication and the granted Graph application
+  permission, such as `Group.ReadBasic.All`; delegated `User.Read` is not sufficient.
+- Authentication or request failure: check the login, network, or service status.
+
+Look for `owner-groups-exist` with `verified in Entra via Microsoft Graph
+(HTTP 200)` for each group. An offline PASS or a successful
+Azure login alone does not prove the application could read the group.
