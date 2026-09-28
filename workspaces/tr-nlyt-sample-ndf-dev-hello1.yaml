@@ -1,5 +1,5 @@
-name: pt-nlyt-sample-ndf-dev-hello1
-country: pt
+name: tr-nlyt-sample-ndf-dev-hello1
+country: tr
 area: nlyt
 subject: sample
 dataProductType: ndf
@@ -8,8 +8,8 @@ suffix: hello1
 domain: dom-ops-dat
 subDomain: sdm-nlyt-smpl
 description: "Sample workspace created via PR-based governance to validate the end-to-end approval and provisioning workflow."
-capacity: contoso-f2-northeurope
-region: northeurope
+capacity: senem2fabric
+region: westeurope
 sensitivityLabel: General
 costCenter: CC-1001
 owners:
@@ -17,7 +17,7 @@ owners:
     identifier: f647243f-dfb1-47f2-a372-1d11ccbf037a   # sg-fabric-governance-demo
     role: Admin
   - principalType: User
-    identifier: workspace-owner@contoso.com   # UPN or Object ID of a workspace owner
+    identifier: d7ea0aa0-13bc-423b-9815-2bb22e2b3b27   # Approved demo user Object ID.
     role: Member
 tags:
   managedBy: frontier-fabric-governance-rvas

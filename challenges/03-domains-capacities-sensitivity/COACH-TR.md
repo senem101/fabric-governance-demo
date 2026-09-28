@@ -55,10 +55,10 @@ Copilot, Graph veya MCP bağlantısı eksikse yetki istemek yerine çevrimdış�
 
 1. **VS Code → File → Open Folder** ile eğitim kopyasını açın; sol alt dal adından `egitim/metadata-lab01` dalını oluşturun.
    Ana sürüme yazmadığınızı gösterin; GitHub ve Fabric hesaplarının farklı yetkiler taşıdığını açıklayın.
-2. **Ctrl+P → `workspaces/pt-nlyt-sample-ndf-dev-hello1.yaml`** dosyasını açın.
+2. **Ctrl+P → `workspaces/tr-nlyt-sample-ndf-dev-hello1.yaml`** dosyasını açın.
    `domain`, `subDomain`, `capacity`, `region`, `sensitivityLabel` ve `costCenter` satırlarını birlikte okuyun.
-3. **Ctrl+P → `rules/policy.yaml`** açın. `dom-ops-dat`, `contoso-f2-northeurope`, `CC-1001` girdilerini bulun.
-   `33333333-3333-3333-3333-333333333333` gerçek kapasite değildir.
+3. **Ctrl+P → `rules/policy.yaml`** açın. `dom-ops-dat`, `senem2fabric`, `CC-1001` girdilerini bulun.
+   Bu kişisel kopyada `senem2fabric` kaydı gerçek F64 kapasitesine bağlanmıştır.
 4. **Ctrl+P → `schemas/workspace.schema.json`** açın. Desteklenen ortamlar `poc/dev/sit/uat/stg/prd`; `sbx` yoktur.
    Alan adı tam olarak `subDomain` olmalı. Yeni bir `domainId` alanı eklemek mevcut şemada reddedilir.
 5. **Terminal → New Terminal → PowerShell** açıp aşağıdakini çalıştırın:
@@ -69,7 +69,7 @@ Copilot, Graph veya MCP bağlantısı eksikse yetki istemek yerine çevrimdış�
    Test-Path .\schemas\domain.schema.json
    Test-Path .\schemas\capacity.schema.json
    $env:LIVE_CHECKS = 'false'
-   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\pt-nlyt-sample-ndf-dev-hello1.yaml
+   .\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\tr-nlyt-sample-ndf-dev-hello1.yaml
    $LASTEXITCODE
    ```
 
@@ -80,7 +80,7 @@ Copilot, Graph veya MCP bağlantısı eksikse yetki istemek yerine çevrimdış�
 ## 5. Sentetik, buluta dokunmayan uygulamalı test
 
 Bu kod mevcut örneği belleğe alır; dosya/policy/tenant değiştirmez.
-Hedef ad `pt-nlyt-sales-ndf-dev-lab01`, domain `dom-ops-dat`, bölge `northeurope` olacaktır.
+Hedef ad `tr-nlyt-sales-ndf-dev-lab01`, domain `dom-ops-dat`, bölge `westeurope` olacaktır.
 Sanal ortam yoksa [ilk kuruluma](../../docs/tr/ilk-kurulum.md) dönün; bu bölümde `provision.py` çalıştırmayın.
 
 1. Aşağıdaki PowerShell bloğunu tek parça kopyalayın:
@@ -93,12 +93,12 @@ Sanal ortam yoksa [ilk kuruluma](../../docs/tr/ilk-kurulum.md) dönün; bu böl�
    from pathlib import Path
    sys.path.insert(0, str(Path("scripts").resolve()))
    from rules_engine import load_yaml, load_policy, validate_manifest
-   base = load_yaml(Path("workspaces") / "pt-nlyt-sample-ndf-dev-hello1.yaml")
-   base.update(name="pt-nlyt-sales-ndf-dev-lab01", subject="sales", suffix="lab01")
+   base = load_yaml(Path("workspaces") / "tr-nlyt-sample-ndf-dev-hello1.yaml")
+   base.update(name="tr-nlyt-sales-ndf-dev-lab01", subject="sales", suffix="lab01")
    policy = load_policy()
    cases = [("dogru", copy.deepcopy(base), copy.deepcopy(policy), None)]
    for title, key, value, rule in [
-       ("yanlis-bolge", "region", "westeurope", "region-matches-capacity"),
+       ("yanlis-bolge", "region", "northeurope", "region-matches-capacity"),
        ("onaysiz-domain", "domain", "dom-ops-lab", "domain-allow-list"),
        ("etiket-yok", "sensitivityLabel", None, "sensitivity-required"),
        ("desteksiz-alan", "domainId", "DEMO", "schema"),
@@ -110,10 +110,10 @@ Sanal ortam yoksa [ilk kuruluma](../../docs/tr/ilk-kurulum.md) dönün; bu böl�
            item[key] = value
        cases.append((title, item, copy.deepcopy(policy), rule))
    prod = copy.deepcopy(base)
-   prod.update(name="pt-nlyt-sales-ndf-prd-lab01", environment="prd", sensitivityLabel="Confidential")
+   prod.update(name="tr-nlyt-sales-ndf-prd-lab01", environment="prd", sensitivityLabel="Confidential")
    prod["owners"][1] = {"principalType": "Group", "identifier": "55555555-5555-5555-5555-555555555555", "role": "Member"}
    restricted = copy.deepcopy(policy)
-   restricted["approvedCapacities"]["contoso-f2-northeurope"]["allowedEnvironments"] = ["dev"]
+   restricted["approvedCapacities"][base["capacity"]]["allowedEnvironments"] = ["dev"]
    cases.append(("prd-dev-kapasitesi", prod, restricted, "capacity-allowed-for-env"))
    for title, item, rules, expected in cases:
        result = validate_manifest(item, policy=rules)
@@ -157,7 +157,7 @@ provision.py ve drift.py üzerinden domain/kapasite/item etiketi boşluklarını
 Önce mevcut davranışı koruyan şema/loader/mock test planını göster; incelememden
 önce dosya değişikliği, commit/push veya workflow çalıştırma yapma. Tenant'a
 bağlanma; API mutasyonu, satın alma, rol/etiket değişikliği yapma.
-pt-nlyt-sales-ndf-dev-lab01 kullan. OLMAYAN dosyaları OLUSTURULACAK diye işaretle.
+tr-nlyt-sales-ndf-dev-lab01 kullan. OLMAYAN dosyaları OLUSTURULACAK diye işaretle.
 Workspace sensitivityLabel alanını gerçek item etiketiyle karıştırma.
 Endpoint/kimlik desteğini resmi belgeye bağla; destek kanıtı yoksa canlı adımı durdur.
 ```
@@ -173,7 +173,7 @@ Endpoint/kimlik desteğini resmi belgeye bağla; destek kanıtı yoksa canlı ad
 4. Kurulu MCP araçlarını kontrol edip salt okunur isteği gönderin:
 
    ```text
-   Yalnız müşteri onaylı pt-nlyt-sales-ndf-dev-lab01 sandbox'ını oku.
+   Yalnız müşteri onaylı tr-nlyt-sales-ndf-dev-lab01 sandbox'ını oku.
    Workspace kimliği, kapasite kimliği/bölgesi, domain ataması ve desteklenen
    öğelerin sensitivity label metadata'sını mevcut okuma araçlarıyla doğrula.
    Veri içeriği çekme. Domain/workspace/item oluşturma, atama, label değiştirme,

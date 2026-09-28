@@ -1,0 +1,24 @@
+# Training draft: keep DRY_RUN=true until live provisioning is approved.
+name: tr-nlyt-sales-ndf-dev-lab01
+country: tr
+area: nlyt
+subject: sales
+dataProductType: ndf
+environment: dev
+suffix: lab01
+domain: dom-ops-dat
+subDomain: sdm-nlyt-sales
+description: "Training workspace for sales analytics using synthetic data only."
+capacity: senem2fabric
+region: westeurope
+sensitivityLabel: General
+costCenter: CC-1001
+owners:
+  - principalType: Group
+    identifier: f647243f-dfb1-47f2-a372-1d11ccbf037a   # sg-fabric-governance-demo
+    role: Admin
+  - principalType: User
+    identifier: d7ea0aa0-13bc-423b-9815-2bb22e2b3b27   # Approved demo user Object ID.
+    role: Member
+tags:
+  purpose: coach-training

@@ -39,7 +39,7 @@ kullanmayın. Aşağıdaki altı parçalı yapı mevcut şemaya uygundur.
 3. Canlı demo için gerçek kapasite ID'sinin **policy içinde** güncellendiğini
    ve iki onaylı grup Object ID'sinin hazır olduğunu doğrulayın.
 4. Provisioner tüm `workspaces\*.yaml` dosyalarını işler. Depodaki
-   `pt-nlyt-sample-ndf-dev-hello1.yaml` örneğini de gerçek değerlere uyarlayın
+   `tr-nlyt-sample-ndf-dev-hello1.yaml` örneğini de gerçek değerlere uyarlayın
    veya müşteri lab'ı hazırlık PR'ında kaldırın. Sahte owner'larla bırakmayın.
 5. Var olan müşteri workspace'iyle aynı adı seçmeyin; kod adı eşleşen kaynağı
    güncelleyebilir. Eğitim ekibine özel bir suffix belirleyin.
@@ -63,13 +63,13 @@ workflow birlikte desteklemelidir.
 ## 5. İlk manifesti oluşturun
 
 1. Kendi branch'inizde `workspaces` klasörüne sağ tıklayın, **New File** seçin.
-2. Dosya adı: `pt-nlyt-sales-ndf-dev-lab01.yaml`.
+2. Dosya adı: `tr-nlyt-sales-ndf-dev-lab01.yaml`.
 3. Aşağıdaki **yerel prova örneğini** yapıştırın; `Ctrl+S` ile kaydedin.
    İki örnek GUID canlıya gitmeden gerçek grup Object ID'leriyle değiştirilmeli.
 
 ```yaml
-name: pt-nlyt-sales-ndf-dev-lab01
-country: pt
+name: tr-nlyt-sales-ndf-dev-lab01
+country: tr
 area: nlyt
 subject: sales
 dataProductType: ndf
@@ -78,8 +78,8 @@ suffix: lab01
 domain: dom-ops-dat
 subDomain: sdm-nlyt-sales
 description: "Training workspace for sales analytics using synthetic data only."
-capacity: contoso-f2-northeurope
-region: northeurope
+capacity: senem2fabric
+region: westeurope
 sensitivityLabel: General
 costCenter: CC-1001
 owners:
@@ -97,7 +97,7 @@ tags:
 
 | Alan | Açıklama |
 |---|---|
-| `pt` | Örnek ülke kodu; gerçek müşteri ülkesini politika onayıyla kullanın |
+| `tr` | Türkiye ülke kodu; bu demo için policy'deki onaylı ülkelere eklendi |
 | `nlyt`, `sales` | Sorumlu alan ve veri konusu |
 | `ndf` | Henüz Bronze/Silver/Gold ayrımı olmayan veri ürünü |
 | `dev` | Geliştirme ortamı |
@@ -118,7 +118,7 @@ Repo kökündeki PowerShell:
 ```powershell
 $env:PYTHONUTF8 = "1"
 $env:LIVE_CHECKS = "false"
-.\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\pt-nlyt-sales-ndf-dev-lab01.yaml
+.\.venv\Scripts\python.exe .\scripts\validate.py .\workspaces\tr-nlyt-sales-ndf-dev-lab01.yaml
 $LASTEXITCODE
 ```
 
@@ -197,7 +197,7 @@ Kullanıcınızın workspace'i görebilmesi için uygun grup üyeliği gerekebil
 Core MCP ile salt okunur istem:
 
 ```text
-Yalnız pt-nlyt-sales-ndf-dev-lab01 adlı eğitim workspace'ini oku.
+Yalnız tr-nlyt-sales-ndf-dev-lab01 adlı eğitim workspace'ini oku.
 Adını, ID'sini, açıklamasını, kapasitesini ve mevcut rol atamalarını göster.
 Bu isim birden çok kaynağa karşılık gelirse dur.
 Kaynak veya rol oluşturma, değiştirme ya da silme.

@@ -85,7 +85,7 @@ class GraphGroupLookupTests(unittest.TestCase):
 
 class LiveGroupValidationTests(unittest.TestCase):
     def setUp(self):
-        sample = rules_engine.REPO_ROOT / "workspaces" / "pt-nlyt-sample-ndf-dev-hello1.yaml"
+        sample = rules_engine.REPO_ROOT / "workspaces" / "tr-nlyt-sample-ndf-dev-hello1.yaml"
         self.manifest = rules_engine.load_yaml(sample)
         self.manifest["owners"][0]["identifier"] = GROUP_ID
         self.policy = rules_engine.load_policy()

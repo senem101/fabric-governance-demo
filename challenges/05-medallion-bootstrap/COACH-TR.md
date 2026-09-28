@@ -59,7 +59,7 @@ Etiketleme yetkisi yoksa bunu “bekleyen kontrol” yazın; onayı atlayıp ba�
 
    ```powershell
    Get-Content .\schemas\workspace.schema.json
-   Get-Content .\workspaces\pt-nlyt-sample-ndf-dev-hello1.yaml
+   Get-Content .\workspaces\tr-nlyt-sample-ndf-dev-hello1.yaml
    Test-Path .\scripts\validate_medallion.py
    ```
 
