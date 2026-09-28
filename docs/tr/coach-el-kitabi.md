@@ -39,7 +39,7 @@ müşteri demosundan önce yeniden kontrol edin.
 | Workspace silme | Manifest silinince canlı workspace silinmez | “Dosyayı silmek veri temizliği değildir.” |
 | Drift issue | Workflow `drift, governance` etiketleriyle issue açabilir; otomatik kapatma yok | “Düzeltmeden sonra sonucu kontrol edip issue'yu biz kapatacağız.” |
 | Hata davranışı | Bazı kapasite/rol hataları yalnız uyarı; UPN çözülemezse atlanabilir | “Yeşil job tek başına başarılı dağıtım kanıtı değil.” |
-| Canlı grup kontrolü | `LIVE_CHECKS=true` Graph kontrolünü açar; bazı hatalar uyarıya dönüşür | “PASS, grup varlığının mutlaka doğrulandığı anlamına gelmez.” |
+| Canlı grup kontrolü | `LIVE_CHECKS=true` Graph kontrolünü açar; başarısız sorgular bloklanır, her bulunan grup için HTTP 200 kanıt satırı yazılır | “Offline PASS veya yalnız Azure login yeterli değildir; `owner-groups-exist` sonucunu da göster.” |
 | Kotalar | Policy'de kota değerleri var; mevcut kural motoru bunları uygulamaz | “Tanımlı kota, çalışan kota kontrolü demek değil.” |
 | CI kapsamı | Bu kopyada `validate` tüm PR'larda bütün workspace manifestlerini doğrular | “Policy/schema değişikliği de tüm workspace'lere uygulanır; yeni kaynak ailelerinin validator'ları hâlâ eklenmelidir.” |
 | Yeni kaynak türleri | 02-08'in birçok schema, script ve workflow'u mevcut değil | “Bunlar geliştirme atölyesi görevleri.” |

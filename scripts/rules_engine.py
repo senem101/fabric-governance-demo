@@ -284,15 +284,28 @@ def apply_rules(manifest: dict, policy: dict) -> list[Finding]:
     # Optional live Entra group existence check
     if os.environ.get("LIVE_CHECKS", "false").lower() == "true":
         try:
-            from _fabric import graph_group_exists  # type: ignore
+            from _fabric import GraphGroupLookupError, graph_group_exists
+        except ImportError:
+            findings.append(
+                Finding("owner-groups-exist", "block",
+                        "live check dependencies could not be imported")
+            )
+        else:
             for g in groups:
-                if not graph_group_exists(g["identifier"]):
+                try:
+                    exists = graph_group_exists(g["identifier"])
+                except GraphGroupLookupError as e:
                     findings.append(
                         Finding("owner-groups-exist", "block",
-                                f"group {g['identifier']} not found in Entra")
+                                f"group {g['identifier']} could not be verified: {e}")
                     )
-        except Exception as e:  # noqa: BLE001
-            findings.append(Finding("owner-groups-exist", "warn", f"live check skipped: {e}"))
+                else:
+                    findings.append(
+                        Finding("owner-groups-exist", "info" if exists else "block",
+                                f"group {g['identifier']} "
+                                + ("verified in Entra via Microsoft Graph (HTTP 200)"
+                                   if exists else "not found in Entra (HTTP 404)"))
+                    )
 
     return findings
 

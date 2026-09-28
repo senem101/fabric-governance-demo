@@ -170,6 +170,35 @@ isimlerinin public rapora çıkmayacağı doğrulanmadan değeri `true` yapmayı
 kullanır; yalnız `FABRIC_CAPACITY_ID` eklemek örnek değeri ezmez.
 Manifestteki mantıksal kapasite adı ile policy anahtarı birebir eşleşmelidir.
 
+### 7.1. İlk provadan sonra canlı grup kontrolünü açın
+
+1. **Entra ID > App registrations > kendi uygulamanız > API permissions >
+   Add a permission > Microsoft Graph > Application permissions** yolunu açın.
+   `Group.ReadBasic.All` iznini kurum onayıyla ekleyin ve yetkili yöneticiye
+   **Grant admin consent** yaptırın. Bu izin yalnız demo grubunu değil,
+   tenant'taki bütün grupların temel bilgilerini okumaya izin verir.
+   Mevcut `User.Read` **Delegated** izni bu uygulama kontrolü için yeterli değildir.
+2. **Entra ID > Groups > demo grubu > Object ID** değerini alın.
+   Manifestte Group owner'ın `identifier` alanına yazın; uygulamanın client ID'si
+   veya SPN Object ID'siyle karıştırmayın. Public repo'da dosya ve raporlar
+   herkesçe görülebilir; gerçek grup kimliğini ancak paylaşım onayıyla yayımlayın.
+3. Kişisel repo'nun **Settings > Secrets and variables > Actions > Variables**
+   bölümünde `LIVE_CHECKS=true` yapın. `DRY_RUN=true` ve `DRIFT_ENABLED=false`
+   kalsın; production onayını bu kontrol için vermeyin.
+4. Manifesti içeren kişisel PR'da `validate` çalışsın. Raporda her grup için
+   **`owner-groups-exist` / `verified in Entra via Microsoft Graph (HTTP 200)`**
+   satırını kontrol edin. Bu, yalnız Azure login başarısından farklı bir kanıttır.
+5. HTTP 404 bulunamayan grubu belirtir. HTTP 401/403, bağlantı, token veya
+   beklenmeyen yanıt hataları artık kontrolü **bloklar**; uyarıyla atlanmaz.
+
+Bu kopyada demo sahibinin açık onayıyla `sg-fabric-governance-demo` grubunun
+gerçek Object ID'si kullanılır. Grup adı örnek `grp_...` standardına uymadığı
+için isteğe bağlı `groupName` alanı yazılmaz; gerçek ad yorumda belirtilir.
+Şema gevşetilmez, sahte grup adı kullanılmaz; hedef grup `identifier` ile
+belirlenir. Grup yeniden adlandırılmaz veya oluşturulmaz. Kullanıcı owner ve
+policy kapasitesi hâlâ örnek değerlerdir; grup kontrolü bunları doğrulamaz
+ve bu hazırlık gerçek provisioning izni değildir.
+
 ## 8. OIDC: GitHub'ın kısa süreli kimliğine güven tanımlayın
 
 OIDC, parola saklamadan GitHub job'ının Entra'dan kısa süreli kimlik almasıdır.
